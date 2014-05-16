@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:paddingTop="8dp"
+  android:paddingBottom="8dp"
+  android:paddingLeft="4dp"
+  android:paddingRight="4dp">
+
+  <ImageView
+    android:id="@+id/aktivitetListIcon"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_alignParentRight="true" />
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Header"
+    android:id="@+id/aktivitetListHeader"
+    android:layout_toLeftOf="@id/aktivitetListIcon"
+    android:textStyle="bold" />
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Sted"
+    android:id="@+id/aktivitetListSted"
+    android:layout_toLeftOf="@id/aktivitetListIcon"
+    android:layout_below="@id/aktivitetListHeader"
+    android:visibility="gone"/>
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Start"
+    android:id="@+id/aktivitetListStartTime"
+    android:layout_toLeftOf="@id/aktivitetListIcon"
+    android:layout_below="@id/aktivitetListSted"/>
+
+  <!-- TODO Her må vi lage plass til det som er spesielt for aktivitetstypene: Riggegruppe, antrekk etc -->
+
+  <TextView
+    android:paddingTop="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Beskrivelse"
+    android:id="@+id/aktivitetListContent"
+    android:layout_toLeftOf="@id/aktivitetListIcon"
+    android:layout_below="@id/aktivitetListStartTime"
+    android:textStyle="italic"
+    android:paddingLeft="8dp"/>
+
+
+</RelativeLayout>

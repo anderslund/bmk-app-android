@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="header_main">Borgemusikken</string>
+  <string name="header_rigg_rydd">Rigging/Rydding</string>
+  <string name="false_button">Nei</string>
+  <string name="true_button">Ja</string>
+  <string name="hurra_toast">Hurra!</string>
+  <string name="uff_toast">Få ut fingeren!</string>
+  <string name="state_current_nyheter">org.lunders.client.android.bmk.CURRENT_NYHETER</string>
+  <string name="erDuMedlem">Er du medlem av BMK?</string>
+  <string name="state_current_aktiviteter">org.lunders.client.android.bmk.CURRENT_AKTIVITETER</string>
+</resources>

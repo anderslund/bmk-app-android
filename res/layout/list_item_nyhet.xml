@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:paddingTop="8dp"
+  android:paddingBottom="8dp"
+  android:paddingLeft="4dp"
+  android:paddingRight="4dp">
+
+  <ImageView
+    android:id="@+id/nyhetListIcon"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_alignParentRight="true" />
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Small Text"
+    android:id="@+id/nyhetListHeader"
+    android:layout_toLeftOf="@id/nyhetListIcon"
+    android:textStyle="bold" />
+
+  <TextView
+    android:paddingTop="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:text="Small Text"
+    android:id="@+id/nyhetListContent"
+    android:layout_toLeftOf="@id/nyhetListIcon"
+    android:layout_below="@id/nyhetListHeader" />
+
+
+</RelativeLayout>
