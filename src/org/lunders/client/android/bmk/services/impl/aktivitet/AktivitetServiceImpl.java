@@ -5,6 +5,7 @@ import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.aktivitet.Konsert;
 import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
 import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
+import org.lunders.client.android.bmk.model.lokasjon.Koordinater;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.util.DateUtil;
@@ -45,13 +46,13 @@ public class AktivitetServiceImpl implements AktivitetService {
 		final Ovelse oe = new Ovelse("Erik Bye", DateUtil.getDate("2014-05-24 12:00"));
 		oe.setTidspunktSlutt(DateUtil.getDate("2014-05-24 16:00"));
 		oe.setBeskrivelse("Ekstraøvelse før Erik Bye-konserten.");
-		oe.setSted(new Sted("Båthusteatret, Fredrikstad"));
+		oe.setSted(new Sted("Båthusteatret, Fredrikstad", new Koordinater(59.211588,10.934392)));
 		l.add(oe);
 
 		final Konsert k = new Konsert("Erik Bye", DateUtil.getDate("2014-05-24 19:00"));
 		k.setTidspunktSlutt(DateUtil.getDate("2014-05-24 21:00"));
 		k.setBeskrivelse(testBeskrivelse);
-		k.setSted(new Sted("Båthusteatret, Fredrikstad"));
+		k.setSted(new Sted("Båthusteatret, Fredrikstad", new Koordinater(59.211588,10.934392)));
 		l.add(k);
 
 		final Ovelse o = new Ovelse(DateUtil.getDate("2014-05-20 19:00"));

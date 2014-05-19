@@ -3,15 +3,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:paddingLeft="8dp"
   android:paddingTop="8dp"
-  android:paddingBottom="8dp"
-  android:paddingLeft="4dp"
-  android:paddingRight="4dp">
+  android:paddingBottom="8dp">
 
   <ImageView
     android:id="@+id/aktivitetListIcon"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
+    android:layout_width="24sp"
+    android:layout_height="24sp"
     android:layout_alignParentRight="true" />
 
   <TextView
@@ -31,7 +30,9 @@
     android:id="@+id/aktivitetListSted"
     android:layout_toLeftOf="@id/aktivitetListIcon"
     android:layout_below="@id/aktivitetListHeader"
-    android:visibility="gone"/>
+    android:visibility="gone"
+    android:editable="false"
+    android:clickable="false" />
 
   <TextView
     android:layout_width="match_parent"
@@ -40,7 +41,7 @@
     android:text="Start"
     android:id="@+id/aktivitetListStartTime"
     android:layout_toLeftOf="@id/aktivitetListIcon"
-    android:layout_below="@id/aktivitetListSted"/>
+    android:layout_below="@id/aktivitetListSted" />
 
   <!-- TODO Her må vi lage plass til det som er spesielt for aktivitetstypene: Riggegruppe, antrekk etc -->
 
@@ -54,7 +55,7 @@
     android:layout_toLeftOf="@id/aktivitetListIcon"
     android:layout_below="@id/aktivitetListStartTime"
     android:textStyle="italic"
-    android:paddingLeft="8dp"/>
+    android:paddingLeft="8dp" />
 
 
 </RelativeLayout>

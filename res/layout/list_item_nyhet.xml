@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  android:paddingLeft="8dp"
   android:paddingTop="8dp"
   android:paddingBottom="8dp"
-  android:paddingLeft="4dp"
-  android:paddingRight="4dp">
+  >
 
   <ImageView
     android:id="@+id/nyhetListIcon"
-    android:layout_width="24dp"
-    android:layout_height="24dp"
+    android:layout_width="24sp"
+    android:layout_height="24sp"
     android:layout_alignParentRight="true" />
 
   <TextView
@@ -32,6 +33,4 @@
     android:id="@+id/nyhetListContent"
     android:layout_toLeftOf="@id/nyhetListIcon"
     android:layout_below="@id/nyhetListHeader" />
-
-
 </RelativeLayout>

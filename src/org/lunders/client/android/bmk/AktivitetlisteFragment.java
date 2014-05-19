@@ -11,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
-import org.lunders.client.android.bmk.model.aktivitet.Konsert;
-import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
@@ -23,13 +21,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class AktivitetFragment extends ListFragment {
+public class AktivitetlisteFragment extends ListFragment {
 
 	private AktivitetService aktivitetService;
 
 	private List<AbstractAktivitet> currentAktiviteter;
 
-	private static final String TAG = AktivitetFragment.class.getSimpleName();
+	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,15 +50,6 @@ public class AktivitetFragment extends ListFragment {
 		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
 		setListAdapter(adapter);
 	}
-
-
-//	@Override
-//	public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
-//		super.onInflate(activity, attrs, savedInstanceState);
-//		CharSequence actionBarTitle = getActivity().getActionBar().getTitle();
-//		String newTitle = actionBarTitle.toString() + ": Nyheter";
-//		getActivity().getActionBar().setTitle(newTitle);
-//	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {

@@ -2,6 +2,9 @@ package org.lunders.client.android.bmk;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
+import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
@@ -10,9 +13,7 @@ import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.util.DateUtil;
-import org.lunders.client.android.bmk.util.StringUtil;
 
-import java.sql.Date;
 
 /**
  * Copyright (c) 2014 - Gjensidige Forsikring ASA
@@ -46,10 +47,27 @@ public class AktivitetDetailFragment extends DialogFragment {
 		TextView aktivitetHeader = (TextView) theView.findViewById(R.id.aktivitetListHeader);
 		aktivitetHeader.setText(aktivitet.getAktivitetstype() + ": " + aktivitet.getNavn());
 
-		//TODO: Sette opp sted på en skikkelig måte, inkl Google Maps
-		Sted sted = aktivitet.getSted();
+		final Sted sted = aktivitet.getSted();
 		TextView tvSted = (TextView) theView.findViewById(R.id.aktivitetListSted);
-		tvSted.setText(sted != null ? sted.toString() : "Sted ikke avklart");
+		if (sted == null) {
+			tvSted.setText(getString(R.string.sted_ikke_avklart));
+		}
+		else {
+			tvSted.setText(sted.getNavn());
+			if (sted.getKoordinater() != null) {
+				tvSted.setClickable(true);
+				tvSted.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+				tvSted.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+				tvSted.setOnClickListener(
+					new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							fireGoogleMaps(sted);
+						}
+					}
+				);
+			}
+		}
 		tvSted.setVisibility(View.VISIBLE);
 
 		TextView aktivitetStart = (TextView) theView.findViewById(R.id.aktivitetListStartTime);
@@ -82,5 +100,12 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 		d.setCanceledOnTouchOutside(true);
 		return d;
+	}
+
+	private void fireGoogleMaps(Sted sted) {
+		//Har allerede sjekket at koordinater != null her.
+		Uri mapURI = Uri.parse(sted.formatAsUri() + "&z=8");
+		Intent i = new Intent(Intent.ACTION_VIEW, mapURI);
+		startActivity(i);
 	}
 }

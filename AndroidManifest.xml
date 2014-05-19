@@ -4,6 +4,7 @@
           android:versionCode="1"
           android:versionName="1.0">
   <uses-sdk android:minSdkVersion="14"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
   <application android:label="@string/header_main" android:theme="@android:style/Theme.Holo.Light" android:icon="@drawable/bmk_logo_transparent">
     <activity android:name=".MainActivity"
               android:label="@string/header_main">
@@ -12,5 +13,6 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
   </application>
 </manifest>

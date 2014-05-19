@@ -12,58 +12,72 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import org.lunders.client.android.bmk.util.DateUtil;
 
+/**
+ * Hovedaktiviteten (den man "lander på") for appen. I denne activityen kan man se på kommende BMK-
+ * aktiviteter (konserter etc), nyheter fra diverse kilder og bilder fra instagram.
+ */
 public class MainActivity extends FragmentActivity {
 
+	/** For å støtte swiping mellom tabs */
 	private ViewPager viewPager;
+	public static final int NUM_FRAGMENTS = 3;
 
+	/** Hoved-metoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setupViewPagerForSwiping();
+		setupActionBar();
+	}
 
-		viewPager = new ViewPager(this);
-		viewPager.setId(R.id.viewPager);
-		viewPager.setOnPageChangeListener(
-			new ViewPager.SimpleOnPageChangeListener() {
-				@Override
-				public void onPageSelected(int position) {
-					// When swiping between pages, select the
-					// corresponding tab.
-					getActionBar().setSelectedNavigationItem(position);
-				}
-			}
-		);
+	/** Setter opp action bar (tool bar) */
+	private void setupActionBar() {
 
-//		FrameLayout fl = (FrameLayout) findViewById(R.id.fragmentContainer);
-//		fl.addView(viewPager);
-
-		//TODO: Må prøve å få pageren under "Neste øvelse"
-//		setContentView(R.layout.activity_nyheter);
-		setContentView(viewPager);
-
+		//Setter dagens dato som subtittel
 		getActionBar().setSubtitle(DateUtil.getFormattedCurrentDate());
 
+		//Setter bakgrunnsbilde
 		Drawable d = getResources().getDrawable(R.drawable.notes_2_trans);
 		getActionBar().setBackgroundDrawable(d);
 
+		//Setter opp en listener på tabene slik at vi kan velge et annet fragment
+		//når vi trykker på en tab.
 		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
 				viewPager.setCurrentItem(tab.getPosition());
 			}
 
 			public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-				// hide the given tab
 			}
 
 			public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-				// probably ignore this event
 			}
 		};
 
+		//Setter opp tabs
 		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		getActionBar().addTab(getActionBar().newTab().setText("Nyheter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Aktiviteter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Bilder").setTabListener(tabListener));
+	}
 
+	/** Setter opp en pager for å støtte swiping mellom tabs */
+	private void setupViewPagerForSwiping() {
+		viewPager = new ViewPager(this);
+		viewPager.setId(R.id.viewPager);
+
+		//Når vi swiper, må vi også sørge for å endre valgt tab. ellers velger vi bare nytt
+		//fragment, uten å oppdatere valgt tab.
+		viewPager.setOnPageChangeListener(
+			new ViewPager.SimpleOnPageChangeListener() {
+				@Override
+				public void onPageSelected(int position) {
+					getActionBar().setSelectedNavigationItem(position);
+				}
+			}
+		);
+
+		//Pageren må ha en adapter som forteller hva som skal gjøres når vi swiper på siden.
 		final FragmentManager fm = getSupportFragmentManager();
 		viewPager.setAdapter(
 			new FragmentStatePagerAdapter(fm) {
@@ -74,18 +88,21 @@ public class MainActivity extends FragmentActivity {
 							return new NyhetlisteFragment();
 
 						case 1:
-							return new AktivitetFragment();
+							return new AktivitetlisteFragment();
 
 						default:
-							return new BilderFragment();
+							return new BildeFragment();
 					}
 				}
 
 				@Override
 				public int getCount() {
-					return 3;
+					return NUM_FRAGMENTS;
 				}
 			}
 		);
+
+		//Setter viewet til aktiviteten
+		setContentView(viewPager);
 	}
 }

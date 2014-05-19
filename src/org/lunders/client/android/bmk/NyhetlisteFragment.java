@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,7 @@ public class NyhetlisteFragment extends ListFragment {
 	private List<Nyhet> currentNyheter;
 
 	private static final String TAG = NyhetlisteFragment.class.getSimpleName();
+	public static final int PREVIEW_SIZE = 100;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,13 @@ public class NyhetlisteFragment extends ListFragment {
 		setListAdapter(adapter);
 	}
 
+//	//	@Override
+//	public void onViewCreated(View view, Bundle savedInstanceState) {
+//		super.onViewCreated(view, savedInstanceState);
+//		getListView().setDivider(getResources().getDrawable(android.R.drawable.screen_background_light_transparent));
+//		getListView().setDividerHeight(20);
+//	}
+
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Nyhet valgtNyhet = (Nyhet) getListAdapter().getItem(position);
@@ -67,13 +76,6 @@ public class NyhetlisteFragment extends ListFragment {
 		dialog.show(fm, "nyhet_detalj");
 	}
 
-	//	@Override
-//	public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
-//		super.onInflate(activity, attrs, savedInstanceState);
-//		CharSequence actionBarTitle = getActivity().getActionBar().getTitle();
-//		String newTitle = actionBarTitle.toString() + ": Nyheter";
-//		getActivity().getActionBar().setTitle(newTitle);
-//	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -90,18 +92,15 @@ public class NyhetlisteFragment extends ListFragment {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			if ( convertView == null ){
+			if (convertView == null) {
 				convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_nyhet, null);
 			}
 
 			Nyhet nyhet = getItem(position);
-
 			TextView nyhetslisteHeader = (TextView) convertView.findViewById(R.id.nyhetListHeader);
 			nyhetslisteHeader.setText(nyhet.getHeader());
-
 			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetListContent);
-			nyhetslisteContent.setText(StringUtil.truncate(nyhet.getContent(), 100));
-
+			nyhetslisteContent.setText(StringUtil.truncate(nyhet.getContent(), PREVIEW_SIZE));
 			ImageView nyhetslisteIcon = (ImageView) convertView.findViewById(R.id.nyhetListIcon);
 
 			int resourceId;
