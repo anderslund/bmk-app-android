@@ -5,17 +5,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
+import android.widget.*;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
+import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceImpl;
-import org.lunders.client.android.bmk.services.impl.bilde.ThumbnailDownloader;
+import org.lunders.client.android.bmk.util.DisplayUtil;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class BildeFragment extends Fragment {
 	private List<Bilde> currentBilder;
 	private GridView gridView;
 
-	private ThumbnailDownloader<ImageView> thumbnailDownloader;
+	private ImageDownloader<ImageView> thumbnailDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 	private InstagramBildeServiceImpl instagramBildeService;
@@ -44,22 +45,23 @@ public class BildeFragment extends Fragment {
 
 		instagramBildeService = new InstagramBildeServiceImpl();
 
-		//Denne har ansvar for å hente URLer (typisk via en slags spørring)  til bilder vi senere skal laste
+		//Denne har ansvar for å hente URLer (typisk via en slags spørring) til bilder vi senere skal laste
 		//thumbnails for
 		new GetAvailblePicturesTask().execute();
 
 		//Dette er en tråd som laster ned thumbnails i bakgrunn. Den har en meldingskø som looperen plukker ut URLer
 		//fra. Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
-		thumbnailDownloader = new ThumbnailDownloader<>(instagramBildeService, new Handler());
+		thumbnailDownloader = new ImageDownloader<>(instagramBildeService, new Handler());
 		thumbnailDownloader.setResponseListener(
-			new ThumbnailDownloader.Listener<ImageView>() {
+			new ImageDownloader.Listener<ImageView>() {
 				@Override
-				public void onThumbnailDownloaded(ImageView imageView, Bitmap thumbnail) {
+				public void onImageDownloaded(ImageView imageView, Bitmap thumbnail) {
 					if (isVisible()) {
 						imageView.setImageBitmap(thumbnail);
 					}
 				}
-			});
+			}
+		);
 		thumbnailDownloader.start();
 		thumbnailDownloader.getLooper();
 	}
@@ -125,9 +127,25 @@ public class BildeFragment extends Fragment {
 
 			ImageView imageView = (ImageView) convertView.findViewById(R.id.bilde_item);
 			imageView.setImageResource(R.drawable.trumpet_icon);
+			imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 
-			Bilde b = getItem(position);
-			thumbnailDownloader.queueThumbnail(imageView, b.getUrl());
+			final Bilde b = getItem(position);
+			if (thumbnailDownloader != null) {
+				thumbnailDownloader.queueImage(imageView, b.getThumbnailUrl());
+			}
+
+			imageView.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						//Åpne en dialog med full-size bilde, antall likes, hvem bildet er tatt av og hvilken tekst
+						Log.i(TAG, "Bilde tatt av " + b.getFotograf() + "'" + b.getBeskrivelse() + "'");
+						FragmentManager fm = getActivity().getSupportFragmentManager();
+						BildeDetailFragment dialog = BildeDetailFragment.newInstance(instagramBildeService, b);
+						dialog.show(fm, "bilde_detalj");
+					}
+				}
+			);
 
 			return convertView;
 		}
@@ -140,7 +158,13 @@ public class BildeFragment extends Fragment {
 
 		@Override
 		protected List<Bilde> doInBackground(Void... params) {
-			return instagramBildeService.hentBilder();
+			try {
+				return instagramBildeService.hentBilder();
+			}
+			catch (IOException e) {
+				Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG);
+				return null;
+			}
 		}
 
 		@Override

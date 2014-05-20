@@ -21,8 +21,8 @@ import java.util.Map;
  *
  * @author G009430
  */
-public class ThumbnailDownloader<Token> extends HandlerThread {
-	private static final String TAG = ThumbnailDownloader.class.getSimpleName();
+public class ImageDownloader<Token> extends HandlerThread {
+	private static final String TAG = ImageDownloader.class.getSimpleName();
 	private static final int MSG_TYPE_PICTURE_DOWNLOAD = 0;
 
 	private BildeService bildeService;
@@ -33,15 +33,15 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
 	private Map<Token, String> requestMap = Collections.synchronizedMap(new HashMap<Token, String>());
 
 
-	public ThumbnailDownloader(BildeService bildeService, Handler downloadResponseHandler) {
+	public ImageDownloader(BildeService bildeService, Handler downloadResponseHandler) {
 		super(TAG);
 		this.bildeService = bildeService;
 		this.downloadResponseHandler = downloadResponseHandler;
 	}
 
 
-	public void queueThumbnail(Token t, String url) {
-		Log.i(TAG, "Queued an URL: " + url);
+	public void queueImage(Token t, String url) {
+		Log.i(TAG, "Queued an URL: " + url + ". Token: " + t);
 		requestMap.put(t, url);
 		downloadRequestHandler.obtainMessage(MSG_TYPE_PICTURE_DOWNLOAD, t).sendToTarget();
 	}
@@ -67,7 +67,7 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
 		}
 
 		try {
-			final byte[] bitmapBytes = bildeService.hentBilderaadata(url);
+			final byte[] bitmapBytes = bildeService.hentRaadata(url);
 			final Bitmap bm = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
 			Log.i(TAG, "Image downloaded");
 
@@ -81,7 +81,7 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
 							return;
 						}
 						requestMap.remove(token);
-						responseListener.onThumbnailDownloaded(token, bm);
+						responseListener.onImageDownloaded(token, bm);
 					}
 				}
 			);
@@ -97,7 +97,7 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
 	}
 
 	public interface Listener<Token> {
-		void onThumbnailDownloaded(Token token, Bitmap thumbnail);
+		void onImageDownloaded(Token token, Bitmap image);
 	}
 
 	public void setResponseListener(Listener<Token> responseListener) {

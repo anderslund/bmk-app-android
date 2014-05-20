@@ -1,6 +1,10 @@
 package org.lunders.client.android.bmk.services.impl.bilde;
 
 import android.net.Uri;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.BildeService;
 
@@ -23,16 +27,44 @@ import java.util.List;
 public class InstagramBildeServiceImpl implements BildeService {
 
 	@Override
-	public List<Bilde> hentBilder() {
+	public List<Bilde> hentBilder() throws IOException {
 		List<Bilde> bilder = new ArrayList<>();
-		bilder.add(new Bilde("http://origincache-ash.fbcdn.net/1169860_710814422284602_1933998227_s.jpg"));
-		bilder.add(new Bilde("http://origincache-prn.fbcdn.net/925231_641994542537743_607653590_s.jpg"));
-		bilder.add(new Bilde("http://origincache-prn.fbcdn.net/1208434_316013088536440_1698313592_s.jpg"));
+
+		byte[] jsonResponse = hentRaadata("https://api.instagram.com/v1/tags/borgemusikken/media/recent?client_id=49ba2748920b40abbc1102daf446f2a0");
+		JSONTokener tokener = new JSONTokener(new String(jsonResponse));
+		try {
+			final JSONObject jo = new JSONObject(tokener);
+			final JSONArray imageData = jo.getJSONArray("data");
+			//For hver "data":
+			for (int i=0; i<imageData.length(); i++) {
+				JSONObject data = (JSONObject) imageData.get(i);
+
+				//Hent ut objektet som heter "thumbnail" under "images"
+				JSONObject thumbnail = data.getJSONObject("images").getJSONObject("thumbnail");
+				JSONObject fullSize = data.getJSONObject("images").getJSONObject("standard_resolution");
+				int numLikes = data.getJSONObject("likes").getInt("count");
+				final JSONObject caption = data.getJSONObject("caption");
+				String text = caption.getString("text");
+				String from = caption.getJSONObject("from").getString("full_name");
+
+
+				//Legg URLen til bildet til i listen
+				final Bilde bilde = new Bilde(thumbnail.getString("url"));
+				bilde.setFullSizeUrl(fullSize.getString("url"));
+				bilde.setBeskrivelse(text);
+				bilde.setFotograf(from);
+				bilde.setNumLikes(numLikes);
+				bilder.add(bilde);
+			}
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
 		return bilder;
 	}
 
 	@Override
-	public byte[] hentBilderaadata(String urlSpec) throws IOException {
+	public byte[] hentRaadata(String urlSpec) throws IOException {
 		URL url = new URL(urlSpec);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 

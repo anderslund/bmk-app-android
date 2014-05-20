@@ -14,7 +14,7 @@ import java.util.Collection;
  * @author G009430
  */
 public interface BildeService {
-	Collection<Bilde> hentBilder();
+	Collection<Bilde> hentBilder() throws IOException;
 
-	byte[] hentBilderaadata(String url) throws IOException;
+	byte[] hentRaadata(String url) throws IOException;
 }
