@@ -1,6 +1,7 @@
 package org.lunders.client.android.bmk.model.nyheter;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Copyright (c) 2014 - Gjensidige Forsikring ASA
@@ -12,37 +13,88 @@ import java.io.Serializable;
  */
 public class Nyhet implements Serializable, Comparable<Nyhet> {
 
-    private String header;
+    private String overskrift;
 
-    private String content;
+    private String ingress;
+
+	private Date dato;
 
     private Nyhetskilde kilde;
 
-    public Nyhet(String header, String content, Nyhetskilde kilde) {
-        this.header = header;
-        this.content = content;
+	private String fullStoryURL;
+	private String fullStory;
+
+	public Nyhet(String overskrift, String ingress, Nyhetskilde kilde) {
+        this.overskrift = overskrift;
+        this.ingress = ingress;
         this.kilde = kilde;
     }
 
-    public String getHeader() {
-        return header;
+    public String getOverskrift() {
+        return overskrift;
     }
 
-    public String getContent() {
-        return content;
+    public String getIngress() {
+        return ingress;
     }
 
     public Nyhetskilde getKilde() {
         return kilde;
     }
 
+	public String getFullStoryURL() {
+		return fullStoryURL;
+	}
+
+	public void setFullStoryURL(String fullStoryURL) {
+		this.fullStoryURL = fullStoryURL;
+	}
+
+	public Date getDato() {
+		return dato;
+	}
+
+	public void setDato(Date dato) {
+		this.dato = dato;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("%s: %s\n%s", kilde, header, content);
+		return String.format("%s: %s\n%s", kilde, overskrift, ingress);
 	}
 
 	@Override
 	public int compareTo(Nyhet another) {
-		return 0;
+		if ( dato == null || another.dato == null) {
+			//Gjør at nyheter hvor vi ikke fant dato, sorterer foran de med dato
+			return 1;
+		}
+
+		//Sorterer i synkende rekkefølge (nyeste først)
+		return another.dato.compareTo(this.dato);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( o != null && o instanceof Nyhet) {
+			Nyhet other = (Nyhet)o;
+			return kilde == other.kilde && overskrift.equals(other.overskrift);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = overskrift.hashCode();
+		result = 31 * result + kilde.hashCode();
+		return result;
+	}
+
+	public void setFullStory(String fullStory) {
+		this.fullStory = fullStory;
+	}
+
+	public String getFullStory() {
+		return fullStory;
 	}
 }

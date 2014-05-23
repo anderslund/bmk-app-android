@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +24,8 @@ public class NyhetDetailFragment extends DialogFragment {
 
 	public static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
 
+	private static final String TAG = NyhetDetailFragment.class.getSimpleName();
+
 	public static NyhetDetailFragment newInstance(Nyhet n) {
 		Bundle args = new Bundle();
 		args.putSerializable(EXTRA_NYHET, n);
@@ -33,19 +35,31 @@ public class NyhetDetailFragment extends DialogFragment {
 		return fragment;
 	}
 
+
+	private View getNyhetDetailView() {
+		View v = getView();
+		if (v == null) {
+			v = getActivity().getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
+		}
+		return v;
+	}
+
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Log.i(TAG, "onCreateDialog");
 
-		View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
 		nyhet = (Nyhet) getArguments().getSerializable(EXTRA_NYHET);
 
-		TextView nyhetslisteHeader = (TextView) v.findViewById(R.id.nyhetListHeader);
-		nyhetslisteHeader.setText(nyhet.getHeader());
+		View v = getNyhetDetailView();
 
-		TextView nyhetslisteContent = (TextView) v.findViewById(R.id.nyhetListContent);
-		nyhetslisteContent.setText(nyhet.getContent());
+		TextView nyhetsHeader = (TextView) v.findViewById(R.id.nyhetHeader);
+		nyhetsHeader.setText(nyhet.getOverskrift());
 
-		ImageView nyhetslisteIcon = (ImageView) v.findViewById(R.id.nyhetListIcon);
+		TextView nyhetslisteContent = (TextView) v.findViewById(R.id.nyhetContent);
+		nyhetslisteContent.setText(nyhet.getFullStory());
+
+		ImageView nyhetslisteIcon = (ImageView) v.findViewById(R.id.nyhetIcon);
 
 		int resourceId;
 		switch (nyhet.getKilde()) {
@@ -60,13 +74,13 @@ public class NyhetDetailFragment extends DialogFragment {
 		}
 		nyhetslisteIcon.setImageResource(resourceId);
 
-		Dialog d = new AlertDialog.Builder(getActivity())
+		Dialog theDialog = new AlertDialog.Builder(getActivity())
 			.setView(v)
-				//.setTitle(nyhet.getHeader())
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 
-		d.setCanceledOnTouchOutside(true);
-		return d;
+		theDialog.setCanceledOnTouchOutside(true);
+		Log.i(TAG, "onCreateDialog exit");
+		return theDialog;
 	}
 }

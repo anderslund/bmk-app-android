@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,61 +18,87 @@ import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImp
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class NyhetlisteFragment extends ListFragment {
+public class NyhetlisteFragment extends ListFragment implements NyhetService.NyhetListener {
 
-	private List<NyhetService> nyhetServices;
+	private List<? extends NyhetService> nyhetServices;
 
-	private List<Nyhet> currentNyheter;
+	private NyhetService bmkWebNyhetService, nmfNyhetService, twitterNyhetService;
+
+	private Set<Nyhet> currentNyheter;
+
+	public static final int PREVIEW_SIZE = 100;
 
 	private static final String TAG = NyhetlisteFragment.class.getSimpleName();
-	public static final int PREVIEW_SIZE = 100;
+
+	public NyhetlisteFragment() {
+		Log.i(TAG, "constructor");
+		nyhetServices = Arrays.asList(
+			bmkWebNyhetService = new BMKWebNyhetServiceImpl(this),
+			nmfNyhetService = new NmfNyhetServiceImpl(),
+			twitterNyhetService = new TwitterNyhetServiceImpl());
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 
-		nyhetServices = Arrays.asList(
-			new BMKWebNyhetServiceImpl(),
-			new NmfNyhetServiceImpl(),
-			new TwitterNyhetServiceImpl());
-
 		if (savedInstanceState != null) {
-			currentNyheter = (List<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
+			currentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
 		}
 
 		if (currentNyheter != null) {
 			Log.i(TAG, "Nyheter hentet fra saved instance state");
 		}
 		else {
-			currentNyheter = new ArrayList<>();
+			currentNyheter = new TreeSet<>();
 			for (NyhetService nyhetService : nyhetServices) {
 				currentNyheter.addAll(nyhetService.hentNyheter());
 			}
 		}
 
-		ArrayAdapter<Nyhet> adapter = new NyhetslisteAdapter(currentNyheter);
-		setListAdapter(adapter);
+		setListAdapter(new NyhetslisteAdapter(currentNyheter));
 	}
 
-//	//	@Override
-//	public void onViewCreated(View view, Bundle savedInstanceState) {
-//		super.onViewCreated(view, savedInstanceState);
-//		getListView().setDivider(getResources().getDrawable(android.R.drawable.screen_background_light_transparent));
-//		getListView().setDividerHeight(20);
-//	}
+	@Override
+	public void onNyheterHentet(Collection<Nyhet> nyheter) {
+		currentNyheter.addAll(nyheter);
+		setListAdapter(new NyhetslisteAdapter(currentNyheter));
+	}
+
+
+	@Override
+	public void onNyhetHentet(Nyhet nyhet) {
+		Log.i(TAG, "onNyhetHentet");
+//		TextView tv = (TextView) getActivity().findViewById(R.id.nyhetContent);
+//		tv.setText(nyhet.getFullStory());
+
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(nyhet);
+		dialog.show(fm, "nyhet_detalj");
+	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		Nyhet valgtNyhet = (Nyhet) getListAdapter().getItem(position);
-		Log.i(TAG, "Klikket på " + valgtNyhet.getHeader());
+		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
 
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(valgtNyhet);
-		dialog.show(fm, "nyhet_detalj");
+		switch (nyhet.getKilde()) {
+			case BMK:
+				bmkWebNyhetService.hentNyhet(nyhet);
+				break;
+
+			case NMF:
+				//TODO
+				nmfNyhetService.hentNyhet(nyhet);
+				break;
+
+			case Twitter:
+				//TODO
+				twitterNyhetService.hentNyhet(nyhet);
+				break;
+		}
 	}
 
 
@@ -86,8 +111,8 @@ public class NyhetlisteFragment extends ListFragment {
 
 	private class NyhetslisteAdapter extends ArrayAdapter<Nyhet> {
 
-		public NyhetslisteAdapter(List<Nyhet> objects) {
-			super(getActivity(), 0, objects);
+		public NyhetslisteAdapter(Set<Nyhet> objects) {
+			super(getActivity(), 0, new ArrayList(objects));
 		}
 
 		@Override
@@ -97,11 +122,13 @@ public class NyhetlisteFragment extends ListFragment {
 			}
 
 			Nyhet nyhet = getItem(position);
-			TextView nyhetslisteHeader = (TextView) convertView.findViewById(R.id.nyhetListHeader);
-			nyhetslisteHeader.setText(nyhet.getHeader());
-			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetListContent);
-			nyhetslisteContent.setText(StringUtil.truncate(nyhet.getContent(), PREVIEW_SIZE));
-			ImageView nyhetslisteIcon = (ImageView) convertView.findViewById(R.id.nyhetListIcon);
+			TextView nyhetslisteHeader = (TextView) convertView.findViewById(R.id.nyhetHeader);
+
+			nyhetslisteHeader.setText(nyhet.getOverskrift());
+			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetContent);
+
+			nyhetslisteContent.setText(StringUtil.truncate(nyhet.getIngress(), PREVIEW_SIZE));
+			ImageView nyhetslisteIcon = (ImageView) convertView.findViewById(R.id.nyhetIcon);
 
 			int resourceId;
 			switch (nyhet.getKilde()) {
@@ -118,4 +145,13 @@ public class NyhetlisteFragment extends ListFragment {
 			return convertView;
 		}
 	}
+
+
+
+//	//	@Override
+//	public void onViewCreated(View view, Bundle savedInstanceState) {
+//		super.onViewCreated(view, savedInstanceState);
+//		getListView().setDivider(getResources().getDrawable(android.R.drawable.screen_background_light_transparent));
+//		getListView().setDividerHeight(20);
+//	}
 }

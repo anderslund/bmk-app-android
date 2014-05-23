@@ -29,8 +29,16 @@ public class AktivitetlisteFragment extends ListFragment {
 
 	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
 
+	public AktivitetlisteFragment() {
+		Log.i(TAG, "constructor");
+		aktivitetService = new AktivitetServiceImpl();
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+
+		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState != null) {
@@ -41,8 +49,6 @@ public class AktivitetlisteFragment extends ListFragment {
 			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
 		}
 		else {
-			aktivitetService = new AktivitetServiceImpl();
-
 			currentAktiviteter = new ArrayList<>();
 			currentAktiviteter.addAll(aktivitetService.hentAktiviteter(new Date()));
 		}

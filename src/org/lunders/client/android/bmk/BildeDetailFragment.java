@@ -2,21 +2,17 @@ package org.lunders.client.android.bmk;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.BildeService;
+import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
-
-import java.io.IOException;
 
 /**
  * Copyright (c) 2014 - Gjensidige Forsikring ASA
@@ -39,7 +35,7 @@ public class BildeDetailFragment extends DialogFragment {
 		return fragment;
 	}
 
-	public BildeDetailFragment() {
+	private BildeDetailFragment() {
 
 	}
 
@@ -49,13 +45,14 @@ public class BildeDetailFragment extends DialogFragment {
 		this.bildeService = bildeService;
 
 		imageDownloader = new ImageDownloader(bildeService, imageResponseHandler = new Handler());
-		imageDownloader.setResponseListener(
-			new ImageDownloader.Listener<ImageView>() {
+		imageDownloader.setDownloadListener(
+			new DownloadListener<ImageView>() {
 				@Override
-				public void onImageDownloaded(ImageView imageView, Bitmap image) {
-					imageView.setImageBitmap(image);
-					imageView.getLayoutParams().height = imageView.getMeasuredWidth();
+				public void onImageDownloaded(ImageView imageView, Bilde image) {
 					imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+					byte[] fullSizeBytes = image.getFullSizeBytes();
+					imageView.setImageBitmap(BitmapFactory.decodeByteArray(fullSizeBytes, 0, fullSizeBytes.length));
+					imageView.getLayoutParams().height = imageView.getMeasuredWidth();
 				}
 			}
 		);
@@ -79,11 +76,11 @@ public class BildeDetailFragment extends DialogFragment {
 		tvNumLikes.setText(String.valueOf(bilde.getNumLikes()));
 
 		ImageView ivBilde = (ImageView) v.findViewById(R.id.bilde_detalj_image);
-		imageDownloader.queueImage(ivBilde, bilde.getFullSizeUrl());
+		imageDownloader.queueImage(ivBilde, bilde, ImageDownloader.ImageType.FULLSIZE);
 
 		Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(v)
-				//.setTitle(bilde.getHeader())
+				//.setTitle(bilde.getOverskrift())
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 

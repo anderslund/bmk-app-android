@@ -94,7 +94,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 		Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(theView)
-				//.setTitle(aktivitet.getHeader())
+				//.setTitle(aktivitet.getOverskrift())
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 

@@ -2,7 +2,7 @@ package org.lunders.client.android.bmk.services;
 
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Copyright (c) 2014 - Gjensidige Forsikring ASA
@@ -13,5 +13,13 @@ import java.util.List;
  * @author G009430
  */
 public interface NyhetService {
-    List<Nyhet> hentNyheter();
+
+    Collection<Nyhet> hentNyheter();
+
+	void hentNyhet(Nyhet nyhet);
+
+	static interface NyhetListener {
+		void onNyheterHentet(Collection<Nyhet> nyheter);
+		void onNyhetHentet(Nyhet nyheten);
+	}
 }

@@ -8,9 +8,11 @@
   <ScrollView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/scrollView">
+    android:id="@+id/nyhet_detalj_scrollView">
 
     <include layout="@layout/list_item_nyhet" />
+
+
 
   </ScrollView>
 

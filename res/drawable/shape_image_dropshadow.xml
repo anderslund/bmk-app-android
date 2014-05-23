@@ -3,7 +3,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
   <item>
-    <inset android:insetBottom="10dp" android:insetRight="10dp">
+    <!--<inset android:insetBottom="10dp" android:insetRight="10dp">-->
 
       <shape android:shape="rectangle">
         <corners android:radius="5dp" />
@@ -14,7 +14,7 @@
           android:endColor="#000000"
           android:startColor="#00000000" />
       </shape>
-    </inset>
+    <!--</inset>-->
   </item>
 
 </layer-list>

@@ -15,4 +15,8 @@ import java.util.List;
  */
 public interface AktivitetService {
     List<AbstractAktivitet> hentAktiviteter(Date tilDato);
+
+	static interface AktivitetListener {
+		void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter);
+	}
 }

@@ -6,25 +6,6 @@
   android:layout_height="fill_parent"
   android:layout_gravity="left|top">
 
-  <TextView
-    style="?android:listSeparatorTextViewStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:id="@+id/nyhetListHeader"
-    android:layout_gravity="center"
-    android:text="Neste øvelse: Tirsdag 20. mai" />
-
-  <TextView
-    style="?android:listSeparatorTextViewStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:id="@+id/nyhetListContent"
-    android:layout_gravity="center"
-    android:text="Neste konsert: Lørdag 24. mai (Erik Bye)"
-    android:autoText="false" />
-
   <FrameLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"

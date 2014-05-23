@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import org.lunders.client.android.bmk.services.BackendFileService;
+import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
@@ -20,14 +22,20 @@ public class MainActivity extends FragmentActivity {
 
 	/** For å støtte swiping mellom tabs */
 	private ViewPager viewPager;
+
+	private BackendFileService fileService;
+
 	public static final int NUM_FRAGMENTS = 3;
 
-	/** Hoved-metoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
+
+	/** Hovedmetoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setupViewPagerForSwiping();
 		setupActionBar();
+
+		fileService = new LiveServiceImpl(this);
 	}
 
 	/** Setter opp action bar (tool bar) */
@@ -83,6 +91,7 @@ public class MainActivity extends FragmentActivity {
 			new FragmentStatePagerAdapter(fm) {
 				@Override
 				public Fragment getItem(int position) {
+					//TODO: Tror ikke disse new'ene her er bra for ytelse etc, fordi de lager nye fragmenter hele tiden.
 					switch (position) {
 						case 0:
 							return new NyhetlisteFragment();

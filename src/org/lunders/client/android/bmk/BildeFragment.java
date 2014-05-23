@@ -1,6 +1,6 @@
 package org.lunders.client.android.bmk;
 
-import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,11 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.Toast;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
+import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceImpl;
-import org.lunders.client.android.bmk.util.DisplayUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,13 +28,21 @@ public class BildeFragment extends Fragment {
 	private List<Bilde> currentBilder;
 	private GridView gridView;
 
-	private ImageDownloader<ImageView> thumbnailDownloader;
+	private ImageDownloader<ImageView> imageDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 	private InstagramBildeServiceImpl instagramBildeService;
 
+
+	public BildeFragment() {
+		Log.i(TAG, "constructor");
+		instagramBildeService = new InstagramBildeServiceImpl();
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.i(TAG, "onCreate");
+
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
@@ -43,27 +54,29 @@ public class BildeFragment extends Fragment {
 			Log.i(TAG, "Bilder hentet fra saved instance state");
 		}
 
-		instagramBildeService = new InstagramBildeServiceImpl();
-
 		//Denne har ansvar for å hente URLer (typisk via en slags spørring) til bilder vi senere skal laste
 		//thumbnails for
-		new GetAvailblePicturesTask().execute();
+		else {
+			new GetAvailblePicturesTask().execute();
+		}
 
 		//Dette er en tråd som laster ned thumbnails i bakgrunn. Den har en meldingskø som looperen plukker ut URLer
 		//fra. Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
-		thumbnailDownloader = new ImageDownloader<>(instagramBildeService, new Handler());
-		thumbnailDownloader.setResponseListener(
-			new ImageDownloader.Listener<ImageView>() {
+		imageDownloader = new ImageDownloader<>(instagramBildeService, new Handler());
+		imageDownloader.setDownloadListener(
+			new DownloadListener<ImageView>() {
 				@Override
-				public void onImageDownloaded(ImageView imageView, Bitmap thumbnail) {
+				public void onImageDownloaded(ImageView imageView, Bilde thumbnail) {
 					if (isVisible()) {
-						imageView.setImageBitmap(thumbnail);
+						imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+						byte[] thumbnailBytes = thumbnail.getThumbnailBytes();
+						imageView.setImageBitmap(BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length));
 					}
 				}
 			}
 		);
-		thumbnailDownloader.start();
-		thumbnailDownloader.getLooper();
+		imageDownloader.start();
+		imageDownloader.getLooper();
 	}
 
 	@Override
@@ -71,7 +84,7 @@ public class BildeFragment extends Fragment {
 		super.onDestroy();
 
 		//Stopper tråden. Dette er viktig, ellers vil Android fortsette å kjøre den i bakgrunnen til enheten restartes.
-		thumbnailDownloader.quit();
+		imageDownloader.quit();
 	}
 
 	@Override
@@ -88,7 +101,7 @@ public class BildeFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		thumbnailDownloader.clearQueue();
+		imageDownloader.clearQueue();
 	}
 
 	@Override
@@ -126,12 +139,19 @@ public class BildeFragment extends Fragment {
 			}
 
 			ImageView imageView = (ImageView) convertView.findViewById(R.id.bilde_item);
-			imageView.setImageResource(R.drawable.trumpet_icon);
-			imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 
 			final Bilde b = getItem(position);
-			if (thumbnailDownloader != null) {
-				thumbnailDownloader.queueImage(imageView, b.getThumbnailUrl());
+			byte[] thumbnailBytes = b.getThumbnailBytes();
+			if (thumbnailBytes != null) {
+				imageView.setImageBitmap(BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length));
+			}
+			else {
+				imageView.setImageResource(R.drawable.trumpet_icon);
+				imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+
+				if (imageDownloader != null) {
+					imageDownloader.queueImage(imageView, b, ImageDownloader.ImageType.THUMBNAIL);
+				}
 			}
 
 			imageView.setOnClickListener(

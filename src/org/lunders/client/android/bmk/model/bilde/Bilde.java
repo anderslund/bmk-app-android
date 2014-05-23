@@ -20,6 +20,9 @@ public class Bilde implements Serializable {
 
 	private String beskrivelse;
 
+	private byte[] thumbnailBytes;
+	private byte[] fullSizeBytes;
+
 	public Bilde() {
 	}
 
@@ -65,5 +68,21 @@ public class Bilde implements Serializable {
 
 	public void setBeskrivelse(String beskrivelse) {
 		this.beskrivelse = beskrivelse;
+	}
+
+	public byte[] getThumbnailBytes() {
+		return thumbnailBytes;
+	}
+
+	public void setThumbnailBytes(byte[] thumbnailBytes) {
+		this.thumbnailBytes = thumbnailBytes;
+	}
+
+	public byte[] getFullSizeBytes() {
+		return fullSizeBytes;
+	}
+
+	public void setFullSizeBytes(byte[] fullSizeBytes) {
+		this.fullSizeBytes = fullSizeBytes;
 	}
 }

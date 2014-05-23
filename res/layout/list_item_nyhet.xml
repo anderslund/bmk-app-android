@@ -4,13 +4,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:paddingLeft="8dp"
-  android:paddingTop="8dp"
-  android:paddingBottom="8dp"
+  android:padding="8dp"
   >
 
   <ImageView
-    android:id="@+id/nyhetListIcon"
+    android:id="@+id/nyhetIcon"
     android:layout_width="24sp"
     android:layout_height="24sp"
     android:layout_alignParentRight="true" />
@@ -19,9 +17,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Small Text"
-    android:id="@+id/nyhetListHeader"
-    android:layout_toLeftOf="@id/nyhetListIcon"
+    android:id="@+id/nyhetHeader"
+    android:layout_toLeftOf="@id/nyhetIcon"
     android:textStyle="bold" />
 
   <TextView
@@ -29,8 +26,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Small Text"
-    android:id="@+id/nyhetListContent"
-    android:layout_toLeftOf="@id/nyhetListIcon"
-    android:layout_below="@id/nyhetListHeader" />
+    android:id="@+id/nyhetContent"
+    android:layout_toLeftOf="@id/nyhetIcon"
+    android:layout_below="@id/nyhetHeader" />
 </RelativeLayout>

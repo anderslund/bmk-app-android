@@ -2,8 +2,9 @@ package org.lunders.client.android.bmk.services.impl.nyhet;
 
 import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
-import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
+import org.lunders.client.android.bmk.services.NyhetService;
+import org.lunders.client.android.bmk.services.impl.AbstractServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  *
  * @author G009430
  */
-public class NmfNyhetServiceImpl implements NyhetService {
+public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetService {
 
 	private static final String TAG = NmfNyhetServiceImpl.class.getSimpleName();
 
@@ -29,7 +30,7 @@ public class NmfNyhetServiceImpl implements NyhetService {
 
     @Override
     public List<Nyhet> hentNyheter() {
-	    Log.i(TAG, "Henter nyheter...");
+	    Log.i(TAG, "Henter nyheter fra NMF...");
 
 	    List l = new ArrayList<>();
 	    l.add(new Nyhet("Vivamus consectetur", testBeskrivelse , Nyhetskilde.NMF));
@@ -37,4 +38,9 @@ public class NmfNyhetServiceImpl implements NyhetService {
 	    Log.i(TAG, "Nyheter hentet");
 	    return l;
     }
+
+	@Override
+	public void hentNyhet(Nyhet nyhet) {
+
+	}
 }
