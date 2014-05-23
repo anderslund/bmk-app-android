@@ -29,8 +29,6 @@ import org.lunders.client.android.bmk.services.NyhetService;
 
 public class NyhetDetailFragment extends DialogFragment implements NyhetService.NyhetDetaljListener {
 
-	private Nyhet nyhet;
-
 	public static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
 
 	private static final String TAG = NyhetDetailFragment.class.getSimpleName();
@@ -55,10 +53,8 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 
 	@Override
 	public void onNyhetHentet(Nyhet nyheten) {
-		Log.i(TAG, "onNyhetHentet: " + nyheten.getFullStory());
+		Log.i(TAG, "onNyhetHentet");
 		TextView nyhetslisteContent = (TextView) getNyhetDetailView().findViewById(R.id.nyhetContent);
-		Log.i(TAG, nyhetslisteContent.toString());
-
 		nyhetslisteContent.setText(nyheten.getFullStory());
 	}
 
@@ -66,7 +62,7 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreateDialog");
 
-		nyhet = (Nyhet) getArguments().getSerializable(EXTRA_NYHET);
+		Nyhet nyhet = (Nyhet) getArguments().getSerializable(EXTRA_NYHET);
 
 		nyhetDetailView = getNyhetDetailView();
 

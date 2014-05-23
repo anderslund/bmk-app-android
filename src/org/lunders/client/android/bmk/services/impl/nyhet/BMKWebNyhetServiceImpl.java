@@ -72,22 +72,15 @@ public class BMKWebNyhetServiceImpl extends AbstractServiceImpl implements Nyhet
 
 		private final Nyhet nyhet;
 		private final NyhetDetaljListener listener;
-		private Handler handler;
 
 		public BMKNyhetDetaljFetcher(Nyhet n, NyhetDetaljListener l) {
 			this.nyhet = n;
 			this.listener = l;
-			handler = new Handler(Looper.getMainLooper()) {
-				@Override
-				public void handleMessage(Message msg) {
-					listener.onNyhetHentet(nyhet);
-				}
-			};
 		}
 
 		@Override
 		protected void onPostExecute(Void aVoid) {
-			handler.sendEmptyMessage(0);
+			listener.onNyhetHentet(nyhet);
 		}
 
 		@Override
