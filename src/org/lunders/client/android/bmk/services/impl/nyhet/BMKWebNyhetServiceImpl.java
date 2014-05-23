@@ -17,6 +17,9 @@
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.Html;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
@@ -59,24 +62,36 @@ public class BMKWebNyhetServiceImpl extends AbstractServiceImpl implements Nyhet
 		return currentNyheter;
 	}
 
-	public void hentNyhet(Nyhet n) {
-		new BMKNyhetDetaljFetcher().execute(n);
+	public void hentNyhet(Nyhet n, NyhetDetaljListener listener) {
+		new BMKNyhetDetaljFetcher(n, listener).execute();
 	}
 
 
 	//TODO: Mulig det kan gjøres noen triks med Html-klassen i stedet for lavnivå textparsing...
-	private class BMKNyhetDetaljFetcher extends AsyncTask<Nyhet, Void, Void> {
+	private class BMKNyhetDetaljFetcher extends AsyncTask<Void, Void, Void> {
 
-		private Nyhet nyhet;
+		private final Nyhet nyhet;
+		private final NyhetDetaljListener listener;
+		private Handler handler;
 
-		@Override
-		protected void onPostExecute(Void aVoid) {
-			nyhetListener.onNyhetHentet(nyhet);
+		public BMKNyhetDetaljFetcher(Nyhet n, NyhetDetaljListener l) {
+			this.nyhet = n;
+			this.listener = l;
+			handler = new Handler(Looper.getMainLooper()) {
+				@Override
+				public void handleMessage(Message msg) {
+					listener.onNyhetHentet(nyhet);
+				}
+			};
 		}
 
 		@Override
-		protected Void doInBackground(Nyhet... params) {
-			nyhet = params[0];
+		protected void onPostExecute(Void aVoid) {
+			handler.sendEmptyMessage(0);
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
 
 			// TODO: Gjøre noe med handlers her, slik at vi kan poppe dialogen og la selve teksten komme senere?
 			try {

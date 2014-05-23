@@ -17,9 +17,7 @@
 package org.lunders.client.android.bmk;
 
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
+import android.os.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -41,18 +39,19 @@ import java.util.List;
 
 public class BildeFragment extends Fragment {
 
+	private InstagramBildeServiceImpl instagramBildeService;
 	private List<Bilde> currentBilder;
 	private GridView gridView;
 
 	private ImageDownloader<ImageView> imageDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
-	private InstagramBildeServiceImpl instagramBildeService;
-
 
 	public BildeFragment() {
 		Log.i(TAG, "constructor");
 		instagramBildeService = new InstagramBildeServiceImpl();
+
+		setupImageDownloader();
 	}
 
 	@Override
@@ -75,9 +74,13 @@ public class BildeFragment extends Fragment {
 		else {
 			new GetAvailblePicturesTask().execute();
 		}
+	}
 
-		//Dette er en tråd som laster ned thumbnails i bakgrunn. Den har en meldingskø som looperen plukker ut URLer
-		//fra. Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
+	private void setupImageDownloader() {
+		//Setter i gang en tråd som laster ned thumbnails i bakgrunnen.
+		//Den har en meldingskø som looperen plukker ut URLer fra.
+		//Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
+		//Handleren her assosieres med den tråden som oppretter den (dvs UI-tråden)
 		imageDownloader = new ImageDownloader<>(instagramBildeService, new Handler());
 		imageDownloader.setDownloadListener(
 			new DownloadListener<ImageView>() {

@@ -17,6 +17,9 @@
 package org.lunders.client.android.bmk;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -84,37 +87,30 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		setListAdapter(new NyhetslisteAdapter(currentNyheter));
 	}
 
-
-	@Override
-	public void onNyhetHentet(Nyhet nyhet) {
-		Log.i(TAG, "onNyhetHentet");
-//		TextView tv = (TextView) getActivity().findViewById(R.id.nyhetContent);
-//		tv.setText(nyhet.getFullStory());
-
-		FragmentManager fm = getActivity().getSupportFragmentManager();
-		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(nyhet);
-		dialog.show(fm, "nyhet_detalj");
-	}
-
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
 
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(nyhet);
+
 		switch (nyhet.getKilde()) {
 			case BMK:
-				bmkWebNyhetService.hentNyhet(nyhet);
+				bmkWebNyhetService.hentNyhet(nyhet, dialog);
 				break;
 
 			case NMF:
 				//TODO
-				nmfNyhetService.hentNyhet(nyhet);
+				nmfNyhetService.hentNyhet(nyhet, dialog);
 				break;
 
 			case Twitter:
 				//TODO
-				twitterNyhetService.hentNyhet(nyhet);
+				twitterNyhetService.hentNyhet(nyhet, dialog);
 				break;
 		}
+
+		dialog.show(fm, "nyhet_detalj");
 	}
 
 

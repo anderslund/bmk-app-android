@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
+import android.os.Handler;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
@@ -41,7 +42,7 @@ public class TwitterNyhetServiceImpl extends AbstractServiceImpl implements Nyhe
 	}
 
 	@Override
-	public void hentNyhet(Nyhet nyhet) {
+	public void hentNyhet(Nyhet nyhet, NyhetDetaljListener h) {
 
 	}
 }

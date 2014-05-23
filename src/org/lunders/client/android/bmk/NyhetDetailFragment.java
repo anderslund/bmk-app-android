@@ -25,14 +25,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
+import org.lunders.client.android.bmk.services.NyhetService;
 
-public class NyhetDetailFragment extends DialogFragment {
+public class NyhetDetailFragment extends DialogFragment implements NyhetService.NyhetDetaljListener {
 
 	private Nyhet nyhet;
 
 	public static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
 
 	private static final String TAG = NyhetDetailFragment.class.getSimpleName();
+	private View nyhetDetailView;
 
 	public static NyhetDetailFragment newInstance(Nyhet n) {
 		Bundle args = new Bundle();
@@ -45,13 +47,20 @@ public class NyhetDetailFragment extends DialogFragment {
 
 
 	private View getNyhetDetailView() {
-		View v = getView();
-		if (v == null) {
-			v = getActivity().getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
+		if (nyhetDetailView == null) {
+			nyhetDetailView = getActivity().getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
 		}
-		return v;
+		return nyhetDetailView;
 	}
 
+	@Override
+	public void onNyhetHentet(Nyhet nyheten) {
+		Log.i(TAG, "onNyhetHentet: " + nyheten.getFullStory());
+		TextView nyhetslisteContent = (TextView) getNyhetDetailView().findViewById(R.id.nyhetContent);
+		Log.i(TAG, nyhetslisteContent.toString());
+
+		nyhetslisteContent.setText(nyheten.getFullStory());
+	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -59,15 +68,12 @@ public class NyhetDetailFragment extends DialogFragment {
 
 		nyhet = (Nyhet) getArguments().getSerializable(EXTRA_NYHET);
 
-		View v = getNyhetDetailView();
+		nyhetDetailView = getNyhetDetailView();
 
-		TextView nyhetsHeader = (TextView) v.findViewById(R.id.nyhetHeader);
+		TextView nyhetsHeader = (TextView) nyhetDetailView.findViewById(R.id.nyhetHeader);
 		nyhetsHeader.setText(nyhet.getOverskrift());
 
-		TextView nyhetslisteContent = (TextView) v.findViewById(R.id.nyhetContent);
-		nyhetslisteContent.setText(nyhet.getFullStory());
-
-		ImageView nyhetslisteIcon = (ImageView) v.findViewById(R.id.nyhetIcon);
+		ImageView nyhetslisteIcon = (ImageView) nyhetDetailView.findViewById(R.id.nyhetIcon);
 
 		int resourceId;
 		switch (nyhet.getKilde()) {
@@ -83,7 +89,7 @@ public class NyhetDetailFragment extends DialogFragment {
 		nyhetslisteIcon.setImageResource(resourceId);
 
 		Dialog theDialog = new AlertDialog.Builder(getActivity())
-			.setView(v)
+			.setView(nyhetDetailView)
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 
