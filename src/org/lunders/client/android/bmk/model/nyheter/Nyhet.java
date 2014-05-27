@@ -30,7 +30,11 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
     private Nyhetskilde kilde;
 
 	private String fullStoryURL;
-	private String fullStory;
+	private CharSequence fullStory;
+
+	public Nyhet() {
+
+	}
 
 	public Nyhet(String overskrift, String ingress, Nyhetskilde kilde) {
         this.overskrift = overskrift;
@@ -38,7 +42,19 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
         this.kilde = kilde;
     }
 
-    public String getOverskrift() {
+	public void setOverskrift(String overskrift) {
+		this.overskrift = overskrift;
+	}
+
+	public void setIngress(String ingress) {
+		this.ingress = ingress;
+	}
+
+	public void setKilde(Nyhetskilde kilde) {
+		this.kilde = kilde;
+	}
+
+	public String getOverskrift() {
         return overskrift;
     }
 
@@ -98,11 +114,11 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 		return result;
 	}
 
-	public void setFullStory(String fullStory) {
+	public void setFullStory(CharSequence fullStory) {
 		this.fullStory = fullStory;
 	}
 
-	public String getFullStory() {
+	public CharSequence getFullStory() {
 		return fullStory;
 	}
 }

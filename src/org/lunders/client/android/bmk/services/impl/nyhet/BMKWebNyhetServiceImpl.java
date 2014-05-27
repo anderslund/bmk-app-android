@@ -17,9 +17,6 @@
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.text.Html;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;

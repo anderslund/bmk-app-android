@@ -52,7 +52,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		Log.i(TAG, "constructor");
 		nyhetServices = Arrays.asList(
 			bmkWebNyhetService = new BMKWebNyhetServiceImpl(this),
-			nmfNyhetService = new NmfNyhetServiceImpl(),
+			nmfNyhetService = new NmfNyhetServiceImpl(this),
 			twitterNyhetService = new TwitterNyhetServiceImpl());
 	}
 
@@ -98,7 +98,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 				break;
 
 			case NMF:
-				//TODO
 				nmfNyhetService.hentNyhet(nyhet, dialog);
 				break;
 

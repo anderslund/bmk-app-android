@@ -19,6 +19,7 @@ package org.lunders.client.android.bmk.util;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class DateUtil {
 
@@ -27,6 +28,8 @@ public class DateUtil {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 	private static final SimpleDateFormat formattedDateFormat = new SimpleDateFormat("dd. MMM yyyy");
+
+	private static final SimpleDateFormat nmfFormattedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss Z", Locale.ENGLISH);
 
 	private static final SimpleDateFormat formattedDateTime = new SimpleDateFormat("EEEE d. MMM yyyy 'kl' HH':'mm");
 
@@ -53,5 +56,13 @@ public class DateUtil {
 			return dateTimeFormat.parse(s, new ParsePosition(0));
 		}
 		return dateFormat.parse(s, new ParsePosition(0));
+	}
+
+	public static synchronized Date getNmfDate(String s) {
+		if (s == null || s.trim().length() == 0) {
+			return null;
+		}
+
+		return nmfFormattedDateFormat.parse(s, new ParsePosition(0));
 	}
 }
