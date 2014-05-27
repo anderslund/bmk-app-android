@@ -38,7 +38,7 @@ import java.util.Set;
 public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthListener, BackendFileService {
 
 	private LiveAuthClient authClient;
-	private LiveConnectClient liveClient;
+	private static LiveConnectClient liveClient;
 	private String aktiviteterFileId;
 	private String twitterFileId;
 	private Set<BackendFileServiceListener> backendListeners;
@@ -57,14 +57,10 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 
 	private static final String TAG = LiveServiceImpl.class.getSimpleName();
 
-	private static LiveServiceImpl INSTANCE;
 	private Context activity;
 
 	public static LiveServiceImpl getInstance(Context context) {
-		if (INSTANCE == null) {
-			INSTANCE = new LiveServiceImpl(context);
-		}
-		return INSTANCE;
+		return new LiveServiceImpl(context);
 	}
 
 	LiveServiceImpl(Context activity) {
@@ -121,7 +117,7 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 
 		new HentAktiviteterThread(activity, liveClient, listener, aktiviteterFileId).start();
 
-		if ( result != null && !result.isEmpty()) {
+		if (result != null && !result.isEmpty()) {
 			listener.onAktiviteterHentet(result);
 		}
 	}
@@ -185,11 +181,7 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 				long t1 = System.currentTimeMillis();
 				Log.i(TAG, "Confirmed Live.com folder structure in " + (t1 - t0) + " ms");
 			}
-			catch (JSONException ex) {
-				Log.w(TAG, "Failed to verify folder structure");
-				ex.printStackTrace();
-			}
-			catch (LiveOperationException ex) {
+			catch (JSONException | LiveOperationException ex) {
 				Log.w(TAG, "Failed to verify folder structure");
 				ex.printStackTrace();
 			}

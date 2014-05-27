@@ -89,7 +89,7 @@ public class BildeFragment extends Fragment {
 				@Override
 				public void onImageDownloaded(ImageView imageView, Bilde thumbnail) {
 					if (isVisible()) {
-						imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+						//imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 						byte[] thumbnailBytes = thumbnail.getThumbnailBytes();
 						imageView.setImageBitmap(BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length));
 					}
@@ -168,7 +168,7 @@ public class BildeFragment extends Fragment {
 			}
 			else {
 				imageView.setImageResource(R.drawable.trumpet_icon);
-				imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+				//imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 
 				if (imageDownloader != null) {
 					imageDownloader.queueImage(imageView, b, ImageDownloader.ImageType.THUMBNAIL);

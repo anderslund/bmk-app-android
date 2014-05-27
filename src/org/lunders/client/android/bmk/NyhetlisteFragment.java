@@ -17,9 +17,6 @@
 package org.lunders.client.android.bmk;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -63,6 +60,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
 
 		if (savedInstanceState != null) {
 			currentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));

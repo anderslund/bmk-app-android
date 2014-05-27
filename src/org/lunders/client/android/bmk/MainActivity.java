@@ -26,8 +26,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import org.lunders.client.android.bmk.services.BackendFileService;
-import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
@@ -39,8 +37,6 @@ public class MainActivity extends FragmentActivity {
 	/** For å støtte swiping mellom tabs */
 	private ViewPager viewPager;
 
-	private BackendFileService fileService;
-
 	public static final int NUM_FRAGMENTS = 3;
 
 
@@ -50,8 +46,6 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setupViewPagerForSwiping();
 		setupActionBar();
-
-		fileService = LiveServiceImpl.getInstance(this);
 	}
 
 	/** Setter opp action bar (tool bar) */

@@ -19,16 +19,17 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
   android:layout_width="wrap_content"
-  android:layout_height="wrap_content">
+  android:layout_height="wrap_content"
+ >
 
   <ImageView
-    android:layout_width="80dp"
-    android:layout_height="80dp"
-    android:layout_gravity="center"
+    android:layout_width="80sp"
+    android:layout_height="80sp"
+    android:gravity="center"
     android:scaleType="fitCenter"
     android:id="@+id/bilde_item"
-    android:layout_marginLeft="8dp"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/shape_image_dropshadow"/>
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="4dp"
+    />
 
 </FrameLayout>

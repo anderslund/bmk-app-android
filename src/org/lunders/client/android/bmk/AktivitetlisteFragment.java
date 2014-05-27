@@ -35,19 +35,18 @@ import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class AktivitetlisteFragment extends ListFragment
 	implements BackendFileService.BackendFileServiceListener, AktivitetService.AktivitetListener {
 
 	private AktivitetService aktivitetService;
+	private BackendFileService backend;
 
 	private List<AbstractAktivitet> currentAktiviteter;
 
 	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
-	private BackendFileService backend;
+
 
 	public AktivitetlisteFragment() {
 		Log.i(TAG, "constructor");
@@ -69,23 +68,32 @@ public class AktivitetlisteFragment extends ListFragment
 
 		if (currentAktiviteter != null) {
 			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
+			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
+			setListAdapter(adapter);
 		}
-		else {
-			currentAktiviteter = new ArrayList<>();
-			currentAktiviteter.addAll(aktivitetService.hentAktiviteter(new Date()));
-		}
+	}
 
-		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
-		setListAdapter(adapter);
+	@Override
+	public void onBackendReady(BackendFileService backend) {
+		backend.hentAktiviteter(this);
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 		Log.i(TAG, "onSaveInstanceState");
 		outState.putSerializable(getString(R.string.state_current_aktiviteter), (Serializable) currentAktiviteter);
 	}
+
+
+	@Override
+	public void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter) {
+		Log.i(TAG, "onAktiviteterHentet");
+		currentAktiviteter = aktiviteter;
+		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
+		setListAdapter(adapter);
+	}
+
 
 
 	@Override
@@ -96,22 +104,6 @@ public class AktivitetlisteFragment extends ListFragment
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		AktivitetDetailFragment dialog = AktivitetDetailFragment.newInstance(valgtAktivitet);
 		dialog.show(fm, "aktivitet_detalj");
-	}
-
-
-	@Override
-	public void onBackendReady(BackendFileService backend) {
-		this.backend = backend;
-		backend.hentAktiviteter(this);
-	}
-
-
-	@Override
-	public void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter) {
-		Log.i(TAG, "onAktiviteterHentet");
-		currentAktiviteter = aktiviteter;
-		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(aktiviteter);
-		setListAdapter(adapter);
 	}
 
 

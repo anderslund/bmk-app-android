@@ -28,6 +28,8 @@ import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.aktivitet.Konsert;
 import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
 import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
+import org.lunders.client.android.bmk.model.lokasjon.Koordinater;
+import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.yaml.snakeyaml.Yaml;
@@ -95,26 +97,53 @@ class HentAktiviteterThread extends HandlerThread {
 			AbstractAktivitet aktivitet;
 			String type = (String) rawAktivitet.get("Aktivitet");
 			String navn = (String) rawAktivitet.get("Navn");
+			String beskrivelse = (String) rawAktivitet.get("Beskrivelse");
 			String tidspunktStart = (String) rawAktivitet.get("TidspunktStart");
+			String tidspunktSlutt = (String) rawAktivitet.get("TidspunktSlutt");
+
+			Map<String, Object> rawSted = (Map<String, Object>) rawAktivitet.get("Sted");
 
 			switch (type) {
 				case "Øvelse":
-					aktivitet = new Ovelse(navn, DateUtil.getDate(tidspunktStart));
+					Ovelse ovelse = new Ovelse(navn, DateUtil.getDate(tidspunktStart));
+					aktivitet = ovelse;
 					break;
+
 				case "Oppdrag":
-					aktivitet = new Oppdrag(navn, DateUtil.getDate(tidspunktStart));
+					Oppdrag oppdrag = new Oppdrag(navn, DateUtil.getDate(tidspunktStart));
+					aktivitet = oppdrag;
 					break;
 				case "Konsert":
-					aktivitet = new Konsert(navn, DateUtil.getDate(tidspunktStart));
+					Konsert konsert = new Konsert(navn, DateUtil.getDate(tidspunktStart));
+					aktivitet = konsert;
 					break;
 
 				default:
 					Log.w(TAG, "Ukjent aktivitetstype: " + type);
 					continue;
 			}
+
+			aktivitet.setBeskrivelse(beskrivelse);
+			aktivitet.setTidspunktStart(DateUtil.getDate(tidspunktSlutt));
+			aktivitet.setSted(getSted(rawSted));
 			result.add(aktivitet);
 		}
 		return result;
+	}
+
+	private Sted getSted(Map<String, Object> rawSted) {
+		if ( rawSted == null ) {
+			return null;
+		}
+
+		Koordinater k = null;
+		Double breddegrad = (Double) rawSted.get("Breddegrad");
+		Double lengdegrad = (Double) rawSted.get("Lengdegrad");
+		if ( breddegrad != null && lengdegrad != null) {
+			k = new Koordinater(lengdegrad, breddegrad);
+		}
+
+		return new Sted((String)rawSted.get("Navn"), k);
 	}
 
 	private void storeAktiviteterToStorage(List<AbstractAktivitet> aktiviteter) {

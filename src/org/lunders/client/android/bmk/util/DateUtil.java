@@ -19,7 +19,6 @@ package org.lunders.client.android.bmk.util;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class DateUtil {
 
@@ -38,7 +37,7 @@ public class DateUtil {
 	}
 
 	public static synchronized String getFormattedDateTime(Date d) {
-		return d == null ? "Ukjent" : formattedDateTime.format(d);
+		return d == null ? "Tidspunkt ikke avklart" : formattedDateTime.format(d);
 	}
 
 	public static synchronized String getFormattedEndTime(Date d) {
