@@ -17,15 +17,19 @@
 package org.lunders.client.android.bmk;
 
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
@@ -38,17 +42,20 @@ public class MainActivity extends FragmentActivity {
 	private ViewPager viewPager;
 
 	public static final int NUM_FRAGMENTS = 3;
+	private ActionBarDrawerToggle mDrawerToggle;
 
 
 	/** Hovedmetoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_nyheter);
 		setupViewPagerForSwiping();
 		setupActionBar();
 	}
 
 	/** Setter opp action bar (tool bar) */
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void setupActionBar() {
 
 		//Setter dagens dato som subtittel
@@ -77,12 +84,56 @@ public class MainActivity extends FragmentActivity {
 		getActionBar().addTab(getActionBar().newTab().setText("Nyheter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Aktiviteter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Bilder").setTabListener(tabListener));
+
+
+
+
+		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, new String[]{"Option 1", "Option2", "Option 3"}));
+
+		mDrawerToggle = new ActionBarDrawerToggle(
+			this,                  /* host Activity */
+			mDrawerLayout,         /* DrawerLayout object */
+			R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+			R.string.drawer_open,  /* "open drawer" description */
+			R.string.drawer_close  /* "close drawer" description */
+		) {
+
+			/** Called when a drawer has settled in a completely closed state. */
+			public void onDrawerClosed(View view) {
+				super.onDrawerClosed(view);
+				//getActionBar().setTitle(mTitle);
+			}
+
+			/** Called when a drawer has settled in a completely open state. */
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+				//getActionBar().setTitle(mDrawerTitle);
+			}
+		};
+
+		// Set the drawer toggle as the DrawerListener
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		//getActionBar().setHomeButtonEnabled(true);
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		// Sync the toggle state after onRestoreInstanceState has occurred.
+		mDrawerToggle.syncState();
 	}
 
 	/** Setter opp en pager for å støtte swiping mellom tabs */
 	private void setupViewPagerForSwiping() {
+
 		viewPager = new ViewPager(this);
 		viewPager.setId(R.id.viewPager);
+
+		FrameLayout fl = (FrameLayout) findViewById(R.id.fragmentContainer);
+		fl.addView(viewPager);
 
 		//Når vi swiper, må vi også sørge for å endre valgt tab. ellers velger vi bare nytt
 		//fragment, uten å oppdatere valgt tab.
@@ -122,6 +173,6 @@ public class MainActivity extends FragmentActivity {
 		);
 
 		//Setter viewet til aktiviteten
-		setContentView(viewPager);
+		//setContentView(viewPager);
 	}
 }

@@ -22,4 +22,6 @@
   <string name="state_current_aktiviteter">org.lunders.client.android.bmk.CURRENT_AKTIVITETER</string>
   <string name="state_current_bilder">org.lunders.client.android.bmk.CURRENT_AKTIVITETER</string>
   <string name="sted_ikke_avklart">Sted ikke avklart</string>
+  <string name="drawer_open">Open drawer</string>
+  <string name="drawer_close">Close drawer</string>
 </resources>
