@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright 2014 Anders Lund
   ~
@@ -16,23 +15,6 @@
   ~ limitations under the License.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-  <item>
-    <shape android:shape="rectangle">
-      <corners android:radius="5dp" />
-      <gradient
-        android:angle="90"
-        android:centerColor="#303339"
-        android:centerY="0.05"
-        android:endColor="#000000"
-        android:startColor="#00000000" />
-    </shape>
-  </item>
-  <item>
-    <inset
-      android:insetBottom="5dp"
-      android:drawable="@drawable/list_item_selector" />
-  </item>
-
-</layer-list>
+</resources>

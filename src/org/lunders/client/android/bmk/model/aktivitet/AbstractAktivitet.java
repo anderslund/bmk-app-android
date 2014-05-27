@@ -24,9 +24,9 @@ import java.util.Date;
 
 public abstract class AbstractAktivitet implements Comparable<AbstractAktivitet>, Serializable {
 
+	private String navn, beskrivelse;
 	private Sted sted;
 	private Date tidspunktStart, tidspunktSlutt;
-	private String navn, beskrivelse;
 	private Aktivitetstype aktivitetstype;
 
 	public AbstractAktivitet(String navn, Date tidspunktStart) {

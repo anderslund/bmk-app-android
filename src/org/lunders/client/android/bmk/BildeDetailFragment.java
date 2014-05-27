@@ -30,7 +30,7 @@ import org.lunders.client.android.bmk.services.BildeService;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 
-public class BildeDetailFragment extends DialogFragment {
+public class BildeDetailFragment extends DialogFragment implements DownloadListener<ImageView>{
 
 	private Bilde bilde;
 
@@ -53,21 +53,17 @@ public class BildeDetailFragment extends DialogFragment {
 		this.bildeService = bildeService;
 
 		imageDownloader = new ImageDownloader(bildeService, imageResponseHandler = new Handler());
-		imageDownloader.setDownloadListener(
-			new DownloadListener<ImageView>() {
-				@Override
-				public void onImageDownloaded(ImageView imageView, Bilde image) {
-					imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
-					byte[] fullSizeBytes = image.getFullSizeBytes();
-					imageView.setImageBitmap(BitmapFactory.decodeByteArray(fullSizeBytes, 0, fullSizeBytes.length));
-					imageView.getLayoutParams().height = imageView.getMeasuredWidth();
-				}
-			}
-		);
+		imageDownloader.setDownloadListener(this);
 		imageDownloader.start();
 		imageDownloader.getLooper();
 	}
 
+	public void onImageDownloaded(ImageView imageView, Bilde image) {
+		imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+		byte[] fullSizeBytes = image.getFullSizeBytes();
+		imageView.setImageBitmap(BitmapFactory.decodeByteArray(fullSizeBytes, 0, fullSizeBytes.length));
+		imageView.getLayoutParams().height = imageView.getMeasuredWidth();
+	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {

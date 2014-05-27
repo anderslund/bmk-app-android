@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2014 Anders Lund
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,23 +14,14 @@
   ~ limitations under the License.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-  <item>
-    <shape android:shape="rectangle">
-      <corners android:radius="5dp" />
-      <gradient
-        android:angle="90"
-        android:centerColor="#303339"
-        android:centerY="0.05"
-        android:endColor="#000000"
-        android:startColor="#00000000" />
-    </shape>
-  </item>
-  <item>
-    <inset
-      android:insetBottom="5dp"
-      android:drawable="@drawable/list_item_selector" />
-  </item>
-
-</layer-list>
+  <style name="ListView" parent="@android:style/Widget.ListView">
+    <item name="android:background">@color/light_grey</item>
+    <item name="android:cacheColorHint">@android:color/transparent</item>
+    <item name="android:divider">@android:color/transparent</item>
+    <item name="android:dividerHeight">0dp</item>
+    <item name="android:listSelector">@drawable/list_item_selector</item>
+    <!--<item name="android:listDivider">@drawable/list_divider_holo_light</item>-->
+  </style>
+</resources>

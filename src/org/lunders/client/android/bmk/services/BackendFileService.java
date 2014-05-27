@@ -16,8 +16,15 @@
 
 package org.lunders.client.android.bmk.services;
 
-import com.microsoft.live.LiveAuthClient;
-
 public interface BackendFileService {
 
+	void addBackendListener(BackendFileServiceListener listener);
+
+	void removeBackendListener(BackendFileServiceListener listener);
+
+	void hentAktiviteter(AktivitetService.AktivitetListener listener);
+
+	static interface BackendFileServiceListener {
+		void onBackendReady(BackendFileService backend);
+	}
 }

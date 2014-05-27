@@ -51,7 +51,7 @@ public class MainActivity extends FragmentActivity {
 		setupViewPagerForSwiping();
 		setupActionBar();
 
-		fileService = new LiveServiceImpl(this);
+		fileService = LiveServiceImpl.getInstance(this);
 	}
 
 	/** Setter opp action bar (tool bar) */

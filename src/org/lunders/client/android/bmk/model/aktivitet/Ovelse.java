@@ -25,7 +25,6 @@ public class Ovelse extends AbstractAktivitet {
 
 	private Riggegruppe riggegruppe;
 
-
 	public Ovelse(Date tidspunktStart) {
 		this("Ordinær", tidspunktStart);
 	}

@@ -18,32 +18,20 @@ package org.lunders.client.android.bmk.services.impl.aktivitet;
 
 import android.util.Log;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
-import org.lunders.client.android.bmk.model.aktivitet.Konsert;
-import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
-import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
-import org.lunders.client.android.bmk.model.lokasjon.Koordinater;
-import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.AktivitetService;
-import org.lunders.client.android.bmk.util.DateUtil;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class AktivitetServiceImpl implements AktivitetService {
 
 	private static final String TAG = AktivitetServiceImpl.class.getSimpleName();
 
-	private String testBeskrivelse = "Konserten er en «hyllest» til Erik Bye sine udødelige viser. " +
-		"Vi har funnet frem noen av de mest kjente tingene han skrev til konserten.\n" +
-		"Det er en link mellom Erik Bye og Alf Prøysen (som har jubileum i år – han ville vært 100 år i 2014)." +
-		"Erik Bye skrev en vise til Alf Prøysen som het Alf." +
-		"Alf Prøysen skrev også en sang til Erik Bye som heter Jørgen Hattemaker." +
-		"Begge disse sangene er med på konserten.\n\n" +
-		"I anledning knyttningen mellom Erik Bye og Alf Prøysen og det at Alf Prøysen har jubileum i år," +
-		"skal vi også spille et Portpori over de mest kjente sangene til Alf Prøysen på konserten.\n\n" +
-		"Konserten vil ha et «maritimt» preg og være på BåthusTeateret i Fredrikstad som ligger på brygga midt i Fr.stad sentrum." +
-		"Solist og konferansier vil være Alexander Hermansen som er en lokal artist fra Fredrikstad med nære bånd til det maritime miljøet i byen.";
 
 	@Override
 	public List<AbstractAktivitet> hentAktiviteter(Date tilDato) {
@@ -51,33 +39,26 @@ public class AktivitetServiceImpl implements AktivitetService {
 
 		List l = new ArrayList();
 
-		final Ovelse oe = new Ovelse("Erik Bye", DateUtil.getDate("2014-05-24 12:00"));
-		oe.setTidspunktSlutt(DateUtil.getDate("2014-05-24 16:00"));
-		oe.setBeskrivelse("Ekstraøvelse før Erik Bye-konserten.");
-		oe.setSted(new Sted("Båthusteatret, Fredrikstad", new Koordinater(59.211588,10.934392)));
-		l.add(oe);
-
-		final Konsert k = new Konsert("Erik Bye", DateUtil.getDate("2014-05-24 19:00"));
-		k.setTidspunktSlutt(DateUtil.getDate("2014-05-24 21:00"));
-		k.setBeskrivelse(testBeskrivelse);
-		k.setSted(new Sted("Båthusteatret, Fredrikstad", new Koordinater(59.211588,10.934392)));
-		l.add(k);
-
-		final Ovelse o = new Ovelse(DateUtil.getDate("2014-05-20 19:00"));
-		o.setTidspunktSlutt(DateUtil.getDate("2014-05-20 22:00"));
-		o.setBeskrivelse("Vanlig øvelse med Sverre som dirigent.");
-		o.setSted(new Sted("Velferdsbygget Denofa"));
-		l.add(o);
-
-		final Oppdrag op1 = new Oppdrag("Varetelling REMA", DateUtil.getDate("2014-06-01 08:00"));
-		op1.setBeskrivelse("Vi tar en heidundrende varetelling for Rema og tjener 10.000 raske.");
-		l.add(op1);
-
-		final Oppdrag op2 = new Oppdrag("Bylørdag", DateUtil.getDate("2014-06-07 11:00"));
-		op2.setBeskrivelse("Bylørdag nr 2 i Fredrikstad sentrum. 10.000 kr i kassa!");
-		l.add(op2);
-
 		Log.i(TAG, "Aktiviteter hentet");
 		return l;
+	}
+
+	public static void main(String[] args) throws Exception {
+		Yaml y = new Yaml();
+
+		Iterable<Object> documents = y.loadAll(
+			new InputStreamReader(
+				new FileInputStream(
+					"C:\\Users\\G009430\\SkyDrive\\Application Data\\bmk-app\\aktiviteter\\aktiviteter.yaml"))
+		);
+
+//		List<Map<String, Map<String, Object>>> steder = (List<Map<String, Map<String, Object>>>) documents.iterator().next();
+
+		List<Map<String, Object>> aktiviteter = (List<Map<String, Object>>) documents.iterator().next();
+
+		for (Map<String, Object> aktivitet: aktiviteter) {
+			System.out.println("Navn: " + aktivitet.get("Navn"));
+			System.out.println("Sted: " + aktivitet.get("Sted"));
+		}
 	}
 }

@@ -27,7 +27,7 @@
     android:id="@+id/nyhetIcon"
     android:layout_width="24sp"
     android:layout_height="24sp"
-    android:layout_alignParentRight="true" />
+    android:layout_alignParentRight="true"/>
 
   <TextView
     android:layout_width="match_parent"

@@ -28,7 +28,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.BackendFileService;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
+import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.StringUtil;
 
@@ -37,13 +39,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class AktivitetlisteFragment extends ListFragment {
+public class AktivitetlisteFragment extends ListFragment
+	implements BackendFileService.BackendFileServiceListener, AktivitetService.AktivitetListener {
 
 	private AktivitetService aktivitetService;
 
 	private List<AbstractAktivitet> currentAktiviteter;
 
 	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
+	private BackendFileService backend;
 
 	public AktivitetlisteFragment() {
 		Log.i(TAG, "constructor");
@@ -53,9 +57,11 @@ public class AktivitetlisteFragment extends ListFragment {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-
 		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
+
+		backend = LiveServiceImpl.getInstance(getActivity());
+		backend.addBackendListener(this);
 
 		if (savedInstanceState != null) {
 			currentAktiviteter = (List<AbstractAktivitet>) savedInstanceState.getSerializable(getString(R.string.state_current_aktiviteter));
@@ -73,12 +79,14 @@ public class AktivitetlisteFragment extends ListFragment {
 		setListAdapter(adapter);
 	}
 
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		Log.i(TAG, "onSaveInstanceState");
 		outState.putSerializable(getString(R.string.state_current_aktiviteter), (Serializable) currentAktiviteter);
 	}
+
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
@@ -89,6 +97,23 @@ public class AktivitetlisteFragment extends ListFragment {
 		AktivitetDetailFragment dialog = AktivitetDetailFragment.newInstance(valgtAktivitet);
 		dialog.show(fm, "aktivitet_detalj");
 	}
+
+
+	@Override
+	public void onBackendReady(BackendFileService backend) {
+		this.backend = backend;
+		backend.hentAktiviteter(this);
+	}
+
+
+	@Override
+	public void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter) {
+		Log.i(TAG, "onAktiviteterHentet");
+		currentAktiviteter = aktiviteter;
+		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(aktiviteter);
+		setListAdapter(adapter);
+	}
+
 
 	private class AktivitetlisteAdapter extends ArrayAdapter<AbstractAktivitet> {
 
