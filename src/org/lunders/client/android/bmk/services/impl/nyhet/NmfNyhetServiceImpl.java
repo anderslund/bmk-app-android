@@ -45,9 +45,10 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 	private Collection<Nyhet> currentNyheter;
 
 	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
+	private static final String NMF_HTML_ARTICLE_HEADLINE = "div class=\"article-content\"";
 
 	private static final String TAG = NmfNyhetServiceImpl.class.getSimpleName();
-	private static final String NMF_HTML_ARTICLE_HEADLINE = "div class=\"article-content\"";
+
 
 	public NmfNyhetServiceImpl(NyhetListener nyhetlisteListener) {
 		this.nyhetlisteListener = nyhetlisteListener;
@@ -168,13 +169,13 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 
 				String innholdHtml = nyhetssideHtml.substring(innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1, innholdEndIndex);
 				long t1 = System.currentTimeMillis();
-				String s =Jsoup.clean(innholdHtml, Whitelist.basic());
-
-				Spanned story = Html.fromHtml(s, configureImageGetter(), null);
+				String s = Jsoup.clean(innholdHtml, Whitelist.basic());
+				System.out.println(s);
+				Spanned story = Html.fromHtml(s);
 				long t2 = System.currentTimeMillis();
 				nyhet.setFullStory(story);
 				long t3 = System.currentTimeMillis();
-				Log.i(TAG, "Hentet full story fra NMF på " + ( t3-t0) + "ms. HTLM-parsing tok " + (t2-t1) + "ms");
+				Log.i(TAG, "Hentet full story fra NMF på " + (t3 - t0) + "ms. HTLM-parsing tok " + (t2 - t1) + "ms");
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -184,26 +185,5 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 			}
 			return null;
 		}
-	}
-
-	public Html.ImageGetter configureImageGetter() {
-		Html.ImageGetter imageGetter = new Html.ImageGetter() {
-			public Drawable getDrawable(String source) {
-				try {
-					if (source.startsWith("/")) {
-						source = "http:/" + source;
-					}
-					Drawable drawable = Drawable.createFromStream(new URL(source).openStream(), "src name");
-					//TODO: Bredden på tekstfeltet den ligger i
-					drawable.setBounds(0, 0, drawable.getIntrinsicHeight(), drawable.getIntrinsicHeight());
-					return drawable;
-				}
-				catch (IOException exception) {
-					Log.v(TAG, "IOException", exception);
-					return null;
-				}
-			}
-		};
-		return imageGetter;
 	}
 }

@@ -64,7 +64,8 @@
       android:id="@+id/nyhetContent"
       android:layout_toLeftOf="@id/nyhetIcon"
       android:textStyle="italic"
-      android:layout_below="@id/nyhetDato" />
+      android:layout_below="@id/nyhetDato"
+      />
   </RelativeLayout>
 
 </FrameLayout>

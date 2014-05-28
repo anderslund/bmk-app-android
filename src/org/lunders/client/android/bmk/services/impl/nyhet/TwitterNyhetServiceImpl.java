@@ -22,6 +22,8 @@ import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
@@ -128,7 +130,9 @@ public class TwitterNyhetServiceImpl extends AbstractServiceImpl implements Nyhe
 					int timestampEndIndex = searchResultHtml.indexOf('"', timestampStartIndex);
 
 					String author = searchResultHtml.substring(authorStartIndex, authorEndIndex);
-					Spanned content = Html.fromHtml(searchResultHtml.substring(contentStartIndex, contentEndIndex));
+					String sContent = Jsoup.clean(searchResultHtml.substring(contentStartIndex, contentEndIndex), Whitelist.basic());
+					Spanned content = Html.fromHtml(sContent);
+
 					String sTimestamp = searchResultHtml.substring(timestampStartIndex, timestampEndIndex);
 
 					Nyhet nyhet = new Nyhet(author, content, Nyhetskilde.Twitter);

@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -58,6 +59,8 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 	public void onNyhetHentet(Nyhet nyheten) {
 		Log.i(TAG, "onNyhetHentet");
 		TextView nyhetslisteContent = (TextView) getNyhetDetailView().findViewById(R.id.nyhetContent);
+		nyhetslisteContent.setLinksClickable(true);
+		nyhetslisteContent.setAutoLinkMask(Linkify.WEB_URLS);
 		nyhetslisteContent.setText(nyheten.getFullStory());
 	}
 
