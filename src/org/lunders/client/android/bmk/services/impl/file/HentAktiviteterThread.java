@@ -148,7 +148,7 @@ class HentAktiviteterThread extends HandlerThread {
 
 	private void storeAktiviteterToStorage(List<AbstractAktivitet> aktiviteter) {
 		try {
-			final FileOutputStream fos = activity.openFileOutput("aktivitetCache", Context.MODE_PRIVATE);
+			final FileOutputStream fos = activity.openFileOutput(LiveServiceImpl.AKTIVITET_CACHE, Context.MODE_PRIVATE);
 			final ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(aktiviteter);
 			oos.flush();

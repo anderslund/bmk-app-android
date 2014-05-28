@@ -53,8 +53,6 @@ public class BMKWebNyhetServiceImpl extends AbstractServiceImpl implements Nyhet
 	}
 
 	public Collection<Nyhet> hentNyheter() {
-		//1. Hent cachede nyheter fra enhetens lager
-		//2. Fyr av en jobb som henter oppdaterte nyheter fra BMK
 		new BMKNyhetListeFetcher().execute();
 		return currentNyheter;
 	}

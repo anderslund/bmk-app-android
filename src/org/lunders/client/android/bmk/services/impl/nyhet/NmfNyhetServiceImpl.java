@@ -159,6 +159,7 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 		protected Void doInBackground(Void... params) {
 
 			try {
+				long t0 = System.currentTimeMillis();
 				String nyhetssideHtml = new String(hentRaadata(nyhet.getFullStoryURL()));
 				int innholdStartIndex = nyhetssideHtml.indexOf(NmfNyhetServiceImpl.NMF_HTML_ARTICLE_HEADLINE);
 				int innholdEndIndex = nyhetssideHtml.indexOf("</div>", innholdStartIndex);
@@ -166,6 +167,8 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 				String innholdHtml = nyhetssideHtml.substring(innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1, innholdEndIndex);
 				final Spanned story = Html.fromHtml(innholdHtml, configureImageGetter(), null);
 				nyhet.setFullStory(story);
+				long t1 = System.currentTimeMillis();
+				Log.i(TAG, "Hentet full story fra NMF på " + ( t1-t0) + "ms");
 			}
 			catch (IOException e) {
 				e.printStackTrace();

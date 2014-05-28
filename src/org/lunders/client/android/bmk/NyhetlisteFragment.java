@@ -53,7 +53,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		nyhetServices = Arrays.asList(
 			bmkWebNyhetService = new BMKWebNyhetServiceImpl(this),
 			nmfNyhetService = new NmfNyhetServiceImpl(this),
-			twitterNyhetService = new TwitterNyhetServiceImpl());
+			twitterNyhetService = new TwitterNyhetServiceImpl(this));
 	}
 
 	@Override
@@ -85,6 +85,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		setListAdapter(new NyhetslisteAdapter(currentNyheter));
 	}
 
+
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
@@ -102,7 +103,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 				break;
 
 			case Twitter:
-				//TODO
 				twitterNyhetService.hentNyhet(nyhet, dialog);
 				break;
 		}
@@ -154,13 +154,4 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 			return convertView;
 		}
 	}
-
-
-
-//	//	@Override
-//	public void onViewCreated(View view, Bundle savedInstanceState) {
-//		super.onViewCreated(view, savedInstanceState);
-//		getListView().setDivider(getResources().getDrawable(android.R.drawable.screen_background_light_transparent));
-//		getListView().setDividerHeight(20);
-//	}
 }

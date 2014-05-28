@@ -18,18 +18,18 @@ package org.lunders.client.android.bmk.util;
 
 public class StringUtil {
 
-	public static String truncate(String s, int maxSize) {
+	public static CharSequence truncate(CharSequence s, int maxSize) {
 		if (isBlank(s)) {
 			return null;
 		}
 
 		if ( s.length() >= maxSize - 3) {
-			return s.substring(0, maxSize-3) + "...";
+			return s.toString().substring(0, maxSize-3) + "...";
 		}
 		return s;
 	}
 
-	public static boolean isBlank(String s) {
-		return s == null || s.trim().length() == 0;
+	public static boolean isBlank(CharSequence s) {
+		return s == null || s.length() == 0;
 	}
 }

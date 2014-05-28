@@ -37,27 +37,43 @@ import java.util.Set;
 
 public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthListener, BackendFileService {
 
+	//Brukes til autentisering mot OneDrive
 	private LiveAuthClient authClient;
+
+	//Brukes til selve operasjonene mot OneDrive
 	private static LiveConnectClient liveClient;
+
+	//OneDrive sin unike ID for aktivitetsfila
 	private String aktiviteterFileId;
+
+	//OneDrive sin unike ID for Twitter-cache-fila
 	private String twitterFileId;
+
 	private Set<BackendFileServiceListener> backendListeners;
+
+	//Aktiviteten som eier denne tjenesten
+	private Context activity;
+
+	public static final String TWITTER_CACHE = "twitterCache";
+	public static final String AKTIVITET_CACHE = "aktivitetCache";
 
 	private static final String LIVE_CLIENT_ID = "000000004811DAAB";
 	private static final String LIVE_CLIENT_SECRET = "oKYURXYnltPwdb3DMgguXUZSY75ooqaO";
 	private static final String FOLDER_BMK_APP = "bmk-app";
-	public static final String FOLDER_ROOT = "Application Data";
-	public static final String FOLDER_TWITTER = "twitter-cache";
-	public static final String FILE_TWITTER = "twitter-cache.json";
-	public static final String FOLDER_AKTIVITETER = "aktiviteter";
-	public static final String FILE_AKTIVITETER = "aktiviteter.yaml";
-	public static final String FOLDER_SKYDRIVE = "me/skydrive/";
+	private static final String FOLDER_ROOT = "Application Data";
+	private static final String FOLDER_TWITTER = "twitter-cache";
+	private static final String FILE_TWITTER = "twitter-cache.json";
+	private static final String FOLDER_AKTIVITETER = "aktiviteter";
+	private static final String FILE_AKTIVITETER = "aktiviteter.yaml";
+	private static final String FOLDER_SKYDRIVE = "me/skydrive/";
 
-	private static final Iterable<String> SCOPES = Arrays.asList("wl.signin", "wl.offline_access", "wl.skydrive", "wl.skydrive_update");
+	//Rettigheter som kreves for å gjøre det vi trenger i OneDrive
+	private static final Iterable<String> SCOPES =
+		Arrays.asList("wl.signin", "wl.offline_access", "wl.skydrive", "wl.skydrive_update");
+
 
 	private static final String TAG = LiveServiceImpl.class.getSimpleName();
 
-	private Context activity;
 
 	public static LiveServiceImpl getInstance(Context context) {
 		return new LiveServiceImpl(context);
@@ -67,8 +83,6 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 		this.activity = activity;
 		authClient = new LiveAuthClient(activity, LIVE_CLIENT_ID);
 		authClient.initialize(SCOPES, this);
-		//authClient.login(activity, SCOPES, this);
-
 		backendListeners = new HashSet<>();
 	}
 
@@ -111,6 +125,7 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 		this.backendListeners.remove(listener);
 	}
 
+
 	@Override
 	public void hentAktiviteter(AktivitetService.AktivitetListener listener) {
 		List<AbstractAktivitet> result = loadAktiviteterFromStorage();
@@ -124,7 +139,7 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 
 	private List<AbstractAktivitet> loadAktiviteterFromStorage() {
 		try {
-			final FileInputStream fis = activity.openFileInput("aktivitetCache");
+			final FileInputStream fis = activity.openFileInput(AKTIVITET_CACHE);
 			final ObjectInputStream ois = new ObjectInputStream(fis);
 			List<AbstractAktivitet> aktiviteter = (List<AbstractAktivitet>) ois.readObject();
 			return aktiviteter;

@@ -29,10 +29,12 @@ import org.lunders.client.android.bmk.services.NyhetService;
 
 public class NyhetDetailFragment extends DialogFragment implements NyhetService.NyhetDetaljListener {
 
-	public static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
+	private View nyhetDetailView;
+
+	private static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
 
 	private static final String TAG = NyhetDetailFragment.class.getSimpleName();
-	private View nyhetDetailView;
+
 
 	public static NyhetDetailFragment newInstance(Nyhet n) {
 		Bundle args = new Bundle();
@@ -50,6 +52,7 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 		}
 		return nyhetDetailView;
 	}
+
 
 	@Override
 	public void onNyhetHentet(Nyhet nyheten) {

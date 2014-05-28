@@ -19,14 +19,10 @@ package org.lunders.client.android.bmk.services.impl.aktivitet;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class AktivitetServiceImpl implements AktivitetService {
 
@@ -41,24 +37,5 @@ public class AktivitetServiceImpl implements AktivitetService {
 
 		Log.i(TAG, "Aktiviteter hentet");
 		return l;
-	}
-
-	public static void main(String[] args) throws Exception {
-		Yaml y = new Yaml();
-
-		Iterable<Object> documents = y.loadAll(
-			new InputStreamReader(
-				new FileInputStream(
-					"C:\\Users\\G009430\\SkyDrive\\Application Data\\bmk-app\\aktiviteter\\aktiviteter.yaml"))
-		);
-
-//		List<Map<String, Map<String, Object>>> steder = (List<Map<String, Map<String, Object>>>) documents.iterator().next();
-
-		List<Map<String, Object>> aktiviteter = (List<Map<String, Object>>) documents.iterator().next();
-
-		for (Map<String, Object> aktivitet: aktiviteter) {
-			System.out.println("Navn: " + aktivitet.get("Navn"));
-			System.out.println("Sted: " + aktivitet.get("Sted"));
-		}
 	}
 }
