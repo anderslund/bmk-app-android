@@ -22,7 +22,7 @@
   <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="19"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <application android:label="@string/header_main" android:theme="@android:style/Theme.Holo.Light" android:icon="@drawable/bmk_logo_transparent" android:largeHeap="true">
-    <activity android:name=".MainActivity"
+    <activity android:name=".NyhetActivity"
               android:label="@string/header_main">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>

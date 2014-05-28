@@ -27,16 +27,14 @@ import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
  * Hovedaktiviteten (den man "lander på") for appen. I denne activityen kan man se på kommende BMK-
  * aktiviteter (konserter etc), nyheter fra diverse kilder og bilder fra instagram.
  */
-public class MainActivity extends FragmentActivity {
+public class NyhetActivity extends FragmentActivity {
 
 	/** For å støtte swiping mellom tabs */
 	private ViewPager viewPager;
@@ -52,6 +50,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_nyheter);
 		setupViewPagerForSwiping();
 		setupActionBar();
+		//setupNavigationDrawer();
 	}
 
 	/** Setter opp action bar (tool bar) */
@@ -84,13 +83,12 @@ public class MainActivity extends FragmentActivity {
 		getActionBar().addTab(getActionBar().newTab().setText("Nyheter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Aktiviteter").setTabListener(tabListener));
 		getActionBar().addTab(getActionBar().newTab().setText("Bilder").setTabListener(tabListener));
+	}
 
-
-
-
+	private void setupNavigationDrawer() {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, new String[]{"Option 1", "Option2", "Option 3"}));
+		//ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		//mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, new String[]{"Option 1", "Option2", "Option 3"}));
 
 		mDrawerToggle = new ActionBarDrawerToggle(
 			this,                  /* host Activity */
@@ -113,17 +111,20 @@ public class MainActivity extends FragmentActivity {
 			}
 		};
 
-		// Set the drawer toggle as the DrawerListener
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		//getActionBar().setHomeButtonEnabled(true);
+
+		// Set the drawer toggle as the DrawerListener
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
-		mDrawerToggle.syncState();
+		if ( mDrawerToggle != null) {
+			mDrawerToggle.syncState();
+		}
 	}
 
 	/** Setter opp en pager for å støtte swiping mellom tabs */
@@ -171,8 +172,5 @@ public class MainActivity extends FragmentActivity {
 				}
 			}
 		);
-
-		//Setter viewet til aktiviteten
-		//setContentView(viewPager);
 	}
 }
