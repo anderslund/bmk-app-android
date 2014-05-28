@@ -21,6 +21,8 @@ import android.os.AsyncTask;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
@@ -166,7 +168,9 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 
 				String innholdHtml = nyhetssideHtml.substring(innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1, innholdEndIndex);
 				long t1 = System.currentTimeMillis();
-				final Spanned story = Html.fromHtml(innholdHtml, configureImageGetter(), null);
+				String s =Jsoup.clean(innholdHtml, Whitelist.basic());
+
+				Spanned story = Html.fromHtml(s, configureImageGetter(), null);
 				long t2 = System.currentTimeMillis();
 				nyhet.setFullStory(story);
 				long t3 = System.currentTimeMillis();
