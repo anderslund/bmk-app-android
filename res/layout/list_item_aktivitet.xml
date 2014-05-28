@@ -16,60 +16,71 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:padding="8dp">
+  android:layout_height="?android:attr/listPreferredItemHeight">
 
-  <ImageView
-    android:id="@+id/aktivitetListIcon"
-    android:layout_width="24sp"
-    android:layout_height="24sp"
-    android:layout_alignParentRight="true" />
-
-  <TextView
+  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Header"
-    android:id="@+id/aktivitetListHeader"
-    android:layout_toLeftOf="@id/aktivitetListIcon"
-    android:textStyle="bold" />
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/card_background">
 
-  <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Sted"
-    android:id="@+id/aktivitetListSted"
-    android:layout_toLeftOf="@id/aktivitetListIcon"
-    android:layout_below="@id/aktivitetListHeader"
-    android:visibility="gone"
-    android:editable="false"
-    android:clickable="false" />
+    <ImageView
+      android:id="@+id/aktivitetListIcon"
+      android:layout_width="24sp"
+      android:layout_height="24sp"
+      android:layout_alignParentRight="true" />
 
-  <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Start"
-    android:id="@+id/aktivitetListStartTime"
-    android:layout_toLeftOf="@id/aktivitetListIcon"
-    android:layout_below="@id/aktivitetListSted" />
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:text="Header"
+      android:id="@+id/aktivitetListHeader"
+      android:layout_toLeftOf="@id/aktivitetListIcon"
+      android:textStyle="bold" />
 
-  <!-- TODO Her må vi lage plass til det som er spesielt for aktivitetstypene: Riggegruppe, antrekk etc -->
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:text="Sted"
+      android:id="@+id/aktivitetListSted"
+      android:layout_toLeftOf="@id/aktivitetListIcon"
+      android:layout_below="@id/aktivitetListHeader"
+      android:visibility="gone"
+      android:editable="false"
+      android:clickable="false" />
 
-  <TextView
-    android:paddingTop="4dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Beskrivelse"
-    android:id="@+id/aktivitetListContent"
-    android:layout_toLeftOf="@id/aktivitetListIcon"
-    android:layout_below="@id/aktivitetListStartTime"
-    android:textStyle="italic"
-    android:paddingLeft="8dp" />
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:text="Start"
+      android:id="@+id/aktivitetListStartTime"
+      android:layout_toLeftOf="@id/aktivitetListIcon"
+      android:layout_below="@id/aktivitetListSted" />
+
+    <!-- TODO Her må vi lage plass til det som er spesielt for aktivitetstypene: Riggegruppe, antrekk etc -->
+
+    <TextView
+      android:paddingTop="4dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:text="Beskrivelse"
+      android:id="@+id/aktivitetListContent"
+      android:layout_toLeftOf="@id/aktivitetListIcon"
+      android:layout_below="@id/aktivitetListStartTime"
+      android:textStyle="italic"
+      android:paddingLeft="8dp" />
 
 
-</RelativeLayout>
+  </RelativeLayout>
+
+</FrameLayout>

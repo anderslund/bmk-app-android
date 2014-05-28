@@ -17,32 +17,54 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:padding="8dp"
-  >
+  android:layout_height="?android:attr/listPreferredItemHeight">
 
-  <ImageView
-    android:id="@+id/nyhetIcon"
-    android:layout_width="24sp"
-    android:layout_height="24sp"
-    android:layout_alignParentRight="true"/>
 
-  <TextView
+  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:id="@+id/nyhetHeader"
-    android:layout_toLeftOf="@id/nyhetIcon"
-    android:textStyle="bold" />
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/card_background">
 
-  <TextView
-    android:paddingTop="4dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:id="@+id/nyhetContent"
-    android:layout_toLeftOf="@id/nyhetIcon"
-    android:layout_below="@id/nyhetHeader" />
-</RelativeLayout>
+    <ImageView
+      android:id="@+id/nyhetIcon"
+      android:layout_width="24sp"
+      android:layout_height="24sp"
+      android:layout_alignParentRight="true" />
+
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:id="@+id/nyhetHeader"
+      android:layout_toLeftOf="@id/nyhetIcon"
+      android:textStyle="bold" />
+
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:id="@+id/nyhetDato"
+      android:layout_toLeftOf="@id/nyhetIcon"
+      android:layout_below="@id/nyhetHeader" />
+
+    <TextView
+      android:paddingTop="4dp"
+      android:paddingLeft="8dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textAppearance="?android:attr/textAppearanceSmall"
+      android:id="@+id/nyhetContent"
+      android:layout_toLeftOf="@id/nyhetIcon"
+      android:textStyle="italic"
+      android:layout_below="@id/nyhetDato" />
+  </RelativeLayout>
+
+</FrameLayout>

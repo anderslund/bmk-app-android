@@ -31,6 +31,7 @@ import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.nyhet.BMKWebNyhetServiceImpl;
 import org.lunders.client.android.bmk.services.impl.nyhet.NmfNyhetServiceImpl;
 import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImpl;
+import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
@@ -77,6 +78,14 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		}
 
 		setListAdapter(new NyhetslisteAdapter(currentNyheter));
+
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		getListView().setDivider(null);
+		getListView().setDividerHeight(20);
 	}
 
 	@Override
@@ -131,12 +140,16 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 			}
 
 			Nyhet nyhet = getItem(position);
+
 			TextView nyhetslisteHeader = (TextView) convertView.findViewById(R.id.nyhetHeader);
-
 			nyhetslisteHeader.setText(nyhet.getOverskrift());
-			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetContent);
 
+			TextView nyhetslisteDato = (TextView) convertView.findViewById(R.id.nyhetDato);
+			nyhetslisteDato.setText(DateUtil.getFormattedDateTime(nyhet.getDato()));
+
+			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetContent);
 			nyhetslisteContent.setText(StringUtil.truncate(nyhet.getIngress(), PREVIEW_SIZE));
+
 			ImageView nyhetslisteIcon = (ImageView) convertView.findViewById(R.id.nyhetIcon);
 
 			int resourceId;

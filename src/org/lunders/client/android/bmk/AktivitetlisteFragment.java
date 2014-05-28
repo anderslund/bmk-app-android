@@ -73,6 +73,14 @@ public class AktivitetlisteFragment extends ListFragment
 		}
 	}
 
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		getListView().setDivider(null);
+		getListView().setDividerHeight(20);
+	}
+
 	@Override
 	public void onBackendReady(BackendFileService backend) {
 		backend.hentAktiviteter(this);

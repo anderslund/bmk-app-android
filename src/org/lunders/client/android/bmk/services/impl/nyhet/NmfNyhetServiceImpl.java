@@ -165,10 +165,12 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 				int innholdEndIndex = nyhetssideHtml.indexOf("</div>", innholdStartIndex);
 
 				String innholdHtml = nyhetssideHtml.substring(innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1, innholdEndIndex);
-				final Spanned story = Html.fromHtml(innholdHtml, configureImageGetter(), null);
-				nyhet.setFullStory(story);
 				long t1 = System.currentTimeMillis();
-				Log.i(TAG, "Hentet full story fra NMF på " + ( t1-t0) + "ms");
+				final Spanned story = Html.fromHtml(innholdHtml, configureImageGetter(), null);
+				long t2 = System.currentTimeMillis();
+				nyhet.setFullStory(story);
+				long t3 = System.currentTimeMillis();
+				Log.i(TAG, "Hentet full story fra NMF på " + ( t3-t0) + "ms. HTLM-parsing tok " + (t2-t1) + "ms");
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -193,7 +195,7 @@ public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetSer
 					return drawable;
 				}
 				catch (IOException exception) {
-					Log.v("IOException", exception.getMessage());
+					Log.v(TAG, "IOException", exception);
 					return null;
 				}
 			}
