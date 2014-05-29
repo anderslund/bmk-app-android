@@ -16,174 +16,21 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.Log;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
-import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
-import org.lunders.client.android.bmk.services.impl.AbstractServiceImpl;
-import org.lunders.client.android.bmk.util.DateUtil;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
+import org.lunders.client.android.bmk.services.impl.nyhet.helpers.NmfNyhetDetaljHelper;
+import org.lunders.client.android.bmk.services.impl.nyhet.helpers.NmfNyhetListeHelper;
+import org.lunders.client.android.bmk.util.ThreadPool;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.TreeSet;
-
-public class NmfNyhetServiceImpl extends AbstractServiceImpl implements NyhetService {
-
-	private final NyhetListener nyhetlisteListener;
-	private Collection<Nyhet> currentNyheter;
-
-	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
-	private static final String NMF_HTML_ARTICLE_HEADLINE = "div class=\"article-content\"";
-
-	private static final String TAG = NmfNyhetServiceImpl.class.getSimpleName();
-
-
-	public NmfNyhetServiceImpl(NyhetListener nyhetlisteListener) {
-		this.nyhetlisteListener = nyhetlisteListener;
-		currentNyheter = new TreeSet<>();
-	}
+public class NmfNyhetServiceImpl implements NyhetService {
 
 	@Override
-	public Collection<Nyhet> hentNyheter() {
-		new NmfNyhetListeFetcher().execute();
-		return currentNyheter;
+	public void hentNyheter(NyhetListener listener) {
+		ThreadPool.getInstance().execute(new NmfNyhetListeHelper(listener));
 	}
 
 	@Override
 	public void hentNyhet(Nyhet nyhet, NyhetDetaljListener listener) {
-		new NmfNyhetDetaljFetcher(nyhet, listener).execute();
-	}
-
-
-
-	private class NmfNyhetListeFetcher extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected void onPostExecute(Void aVoid) {
-			nyhetlisteListener.onNyheterHentet(currentNyheter);
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			Log.i(TAG, "Henter nyheter fra BMK...");
-			Collection<Nyhet> nyheter = new ArrayList<>();
-
-			try {
-				String rssXML = new String(hentRaadata(NMF_WEB_ROOT), "UTF-8");
-				final XmlPullParser xmlPullParser = XmlPullParserFactory.newInstance().newPullParser();
-				xmlPullParser.setInput(new StringReader(rssXML));
-
-				while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
-					String elementName = xmlPullParser.getName();
-					if ("item".equals(elementName) && xmlPullParser.getEventType() == XmlPullParser.START_TAG) {
-						Nyhet n = extractOneNyhet(xmlPullParser);
-						nyheter.add(n);
-					}
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			finally {
-				currentNyheter = nyheter;
-				Log.i(TAG, "Nyheter hentet fra NMF");
-			}
-			return null;
-		}
-
-		private Nyhet extractOneNyhet(XmlPullParser xmlPullParser) throws XmlPullParserException, IOException {
-
-			Nyhet n = new Nyhet();
-			n.setKilde(Nyhetskilde.NMF);
-
-			String text = null;
-
-			newsItem:
-			while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
-
-				switch (xmlPullParser.getEventType()) {
-
-					case XmlPullParser.TEXT:
-						text = xmlPullParser.getText();
-						break;
-
-					case (XmlPullParser.END_TAG):
-						if ("title".equals(xmlPullParser.getName())) {
-							n.setOverskrift(text);
-						}
-						else if ("pubDate".equals(xmlPullParser.getName())) {
-							n.setDato(DateUtil.getNmfDate(text));
-						}
-						else if ("link".equals(xmlPullParser.getName())) {
-							n.setFullStoryURL(text);
-						}
-						else if ("description".equals(xmlPullParser.getName())) {
-							n.setIngress(text);
-						}
-
-						else if ("item".equals(xmlPullParser.getName())) {
-							break newsItem;
-						}
-				}
-			}
-			return n;
-		}
-	}
-
-
-	private class NmfNyhetDetaljFetcher extends AsyncTask<Void, Void, Void> {
-
-		private final Nyhet nyhet;
-		private final NyhetDetaljListener listener;
-
-		public NmfNyhetDetaljFetcher(Nyhet n, NyhetDetaljListener l) {
-			this.nyhet = n;
-			this.listener = l;
-		}
-
-		@Override
-		protected void onPostExecute(Void aVoid) {
-			listener.onNyhetHentet(nyhet);
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-
-			try {
-				long t0 = System.currentTimeMillis();
-				String nyhetssideHtml = new String(hentRaadata(nyhet.getFullStoryURL()));
-				int innholdStartIndex = nyhetssideHtml.indexOf(NmfNyhetServiceImpl.NMF_HTML_ARTICLE_HEADLINE);
-				int innholdEndIndex = nyhetssideHtml.indexOf("</div>", innholdStartIndex);
-
-				String innholdHtml = nyhetssideHtml.substring(innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1, innholdEndIndex);
-				long t1 = System.currentTimeMillis();
-				String s = Jsoup.clean(innholdHtml, Whitelist.basic());
-				System.out.println(s);
-				Spanned story = Html.fromHtml(s);
-				long t2 = System.currentTimeMillis();
-				nyhet.setFullStory(story);
-				long t3 = System.currentTimeMillis();
-				Log.i(TAG, "Hentet full story fra NMF på " + (t3 - t0) + "ms. HTLM-parsing tok " + (t2 - t1) + "ms");
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			finally {
-				Log.i(TAG, "Full story hentet fra NMF");
-			}
-			return null;
-		}
+		ThreadPool.getInstance().execute(new NmfNyhetDetaljHelper(nyhet, listener));
 	}
 }

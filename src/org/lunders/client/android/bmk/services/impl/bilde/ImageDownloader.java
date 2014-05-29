@@ -22,6 +22,7 @@ import android.os.Message;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.BildeService;
+import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -80,7 +81,7 @@ public class ImageDownloader<Token> extends HandlerThread {
 		final String url = (imageType == ImageType.THUMBNAIL ? b.getThumbnailUrl() : b.getFullSizeUrl());
 
 		try {
-			final byte[] bitmapBytes = bildeService.hentRaadata(url);
+			final byte[] bitmapBytes = ServiceHelper.hentRaadata(url);
 			if (imageType == ImageType.THUMBNAIL) {
 				b.setThumbnailBytes(bitmapBytes);
 			}

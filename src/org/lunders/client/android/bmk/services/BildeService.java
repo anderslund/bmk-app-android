@@ -23,6 +23,4 @@ import java.util.Collection;
 
 public interface BildeService {
 	Collection<Bilde> hentBilder() throws IOException;
-
-	byte[] hentRaadata(String url) throws IOException;
 }

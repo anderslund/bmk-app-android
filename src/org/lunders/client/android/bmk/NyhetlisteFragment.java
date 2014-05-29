@@ -52,9 +52,9 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 	public NyhetlisteFragment() {
 		Log.i(TAG, "constructor");
 		nyhetServices = Arrays.asList(
-			bmkWebNyhetService = new BMKWebNyhetServiceImpl(this),
-			nmfNyhetService = new NmfNyhetServiceImpl(this),
-			twitterNyhetService = new TwitterNyhetServiceImpl(this));
+			bmkWebNyhetService = new BMKWebNyhetServiceImpl(),
+			nmfNyhetService = new NmfNyhetServiceImpl(),
+			twitterNyhetService = new TwitterNyhetServiceImpl());
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		else {
 			currentNyheter = new TreeSet<>();
 			for (NyhetService nyhetService : nyhetServices) {
-				currentNyheter.addAll(nyhetService.hentNyheter());
+				nyhetService.hentNyheter(this);
 			}
 		}
 
@@ -93,7 +93,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		currentNyheter.addAll(nyheter);
 		setListAdapter(new NyhetslisteAdapter(currentNyheter));
 	}
-
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {

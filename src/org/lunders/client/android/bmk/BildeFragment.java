@@ -33,7 +33,7 @@ import android.widget.Toast;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
-import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceImpl;
+import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceHelper;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -41,7 +41,7 @@ import java.util.List;
 
 public class BildeFragment extends Fragment {
 
-	private InstagramBildeServiceImpl instagramBildeService;
+	private InstagramBildeServiceHelper instagramBildeService;
 	private List<Bilde> currentBilder;
 	private GridView gridView;
 
@@ -51,7 +51,7 @@ public class BildeFragment extends Fragment {
 
 	public BildeFragment() {
 		Log.i(TAG, "constructor");
-		instagramBildeService = new InstagramBildeServiceImpl();
+		instagramBildeService = new InstagramBildeServiceHelper();
 
 		setupImageDownloader();
 	}

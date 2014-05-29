@@ -22,19 +22,19 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.BildeService;
-import org.lunders.client.android.bmk.services.impl.AbstractServiceImpl;
+import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InstagramBildeServiceImpl extends AbstractServiceImpl implements BildeService {
+public class InstagramBildeServiceHelper implements BildeService {
 
 	@Override
 	public List<Bilde> hentBilder() throws IOException {
 		List<Bilde> bilder = new ArrayList<>();
 
-		byte[] jsonResponse = hentRaadata("https://api.instagram.com/v1/tags/borgemusikken/media/recent?client_id=49ba2748920b40abbc1102daf446f2a0");
+		byte[] jsonResponse = ServiceHelper.hentRaadata("https://api.instagram.com/v1/tags/borgemusikken/media/recent?client_id=49ba2748920b40abbc1102daf446f2a0");
 		JSONTokener tokener = new JSONTokener(new String(jsonResponse));
 		try {
 			final JSONObject jo = new JSONObject(tokener);

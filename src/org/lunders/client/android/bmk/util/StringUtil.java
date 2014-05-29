@@ -16,6 +16,8 @@
 
 package org.lunders.client.android.bmk.util;
 
+import android.text.Html;
+
 public class StringUtil {
 
 	public static CharSequence truncate(CharSequence s, int maxSize) {
@@ -31,5 +33,19 @@ public class StringUtil {
 
 	public static boolean isBlank(CharSequence s) {
 		return s == null || s.length() == 0;
+	}
+
+	/**
+	 * Fjerner HTML-tagger fra s og trimmer den.
+	 *
+	 * @param s
+	 * @return
+	 */
+	public static String cleanHtml(String s) {
+		if (StringUtil.isBlank(s)) {
+			return "";
+		}
+
+		return Html.fromHtml(s).toString().trim();
 	}
 }

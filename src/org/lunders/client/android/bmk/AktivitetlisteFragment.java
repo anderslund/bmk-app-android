@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
@@ -68,7 +69,7 @@ public class AktivitetlisteFragment extends ListFragment
 
 		if (currentAktiviteter != null) {
 			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
-			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
+			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(getActivity(), currentAktiviteter);
 			setListAdapter(adapter);
 		}
 	}
@@ -98,8 +99,11 @@ public class AktivitetlisteFragment extends ListFragment
 	public void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter) {
 		Log.i(TAG, "onAktiviteterHentet");
 		currentAktiviteter = aktiviteter;
-		ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(currentAktiviteter);
-		setListAdapter(adapter);
+		Context c = getActivity();
+		if (c != null) {
+			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(c, currentAktiviteter);
+			setListAdapter(adapter);
+		}
 	}
 
 
@@ -117,8 +121,8 @@ public class AktivitetlisteFragment extends ListFragment
 
 	private class AktivitetlisteAdapter extends ArrayAdapter<AbstractAktivitet> {
 
-		public AktivitetlisteAdapter(List<AbstractAktivitet> objects) {
-			super(getActivity(), 0, objects);
+		public AktivitetlisteAdapter(Context c, List<AbstractAktivitet> objects) {
+			super(c, 0, objects);
 		}
 
 		@Override

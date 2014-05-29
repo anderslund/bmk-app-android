@@ -17,7 +17,6 @@
 package org.lunders.client.android.bmk.services.impl.file;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 import com.microsoft.live.*;
 import org.json.JSONArray;
@@ -26,8 +25,9 @@ import org.json.JSONObject;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.BackendFileService;
-import org.lunders.client.android.bmk.services.impl.AbstractServiceImpl;
+import org.lunders.client.android.bmk.services.impl.file.helpers.HentAktiviteterHelper;
 import org.lunders.client.android.bmk.util.StringUtil;
+import org.lunders.client.android.bmk.util.ThreadPool;
 
 import java.io.*;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthListener, BackendFileService {
+public class LiveServiceImpl implements LiveAuthListener, BackendFileService {
 
 	//Brukes til autentisering mot OneDrive
 	private LiveAuthClient authClient;
@@ -96,7 +96,7 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 			twitterFileId = readFileIdFromStorage("twitter");
 
 			if (aktiviteterFileId == null || twitterFileId == null) {
-				new VerifyFolderStructureTask().execute();
+				ThreadPool.getInstance().execute(new VerifyFolderStructureHelper());
 			}
 			else {
 				notifyBackendListeners();
@@ -128,10 +128,16 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 
 	@Override
 	public void hentAktiviteter(AktivitetService.AktivitetListener listener) {
+
+		//Henter aktiviteter fra lokalt lager først
 		List<AbstractAktivitet> result = loadAktiviteterFromStorage();
 
-		new HentAktiviteterThread(activity, liveClient, listener, aktiviteterFileId).start();
+		//Henter OGSÅ fersk kopi fra Live og lagrer lokalt
+		final HentAktiviteterHelper hentAktiviteterThread =
+			new HentAktiviteterHelper(activity, liveClient, listener, aktiviteterFileId);
+		ThreadPool.getInstance().execute(hentAktiviteterThread);
 
+		//Dersom vi fikk noe fra lokalt lager, så sier vi fra om det.
 		if (result != null && !result.isEmpty()) {
 			listener.onAktiviteterHentet(result);
 		}
@@ -150,15 +156,52 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 		return null;
 	}
 
-	private class VerifyFolderStructureTask extends AsyncTask<Void, Void, Void> {
+	private void writeFileIdToStorage(String fileName, String fileId) throws FileNotFoundException {
+		final FileOutputStream fos = activity.openFileOutput(fileName, Context.MODE_PRIVATE);
+		final PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(fos));
+		printWriter.println(fileId);
+		printWriter.flush();
+		printWriter.close();
+	}
 
-		@Override
-		protected void onPostExecute(Void aVoid) {
+	private String readFileIdFromStorage(String fileName) {
+		BufferedReader reader = null;
+		try {
+			final FileInputStream fis = activity.openFileInput(fileName);
+			reader = new BufferedReader(new InputStreamReader(fis));
+			return reader.readLine();
+		}
+		catch (IOException e) {
+			Log.w(TAG, "Failed to read fileID from local storage");
+			return null;
+		}
+		finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				}
+				catch (IOException e) {
+					//Ignore
+				}
+			}
+		}
+	}
+
+	private void notifyBackendListeners() {
+		for (BackendFileServiceListener listener : backendListeners) {
+			listener.onBackendReady(LiveServiceImpl.this);
+		}
+	}
+
+
+	private class VerifyFolderStructureHelper implements Runnable {
+
+		public void run() {
+			doVerification();
 			notifyBackendListeners();
 		}
 
-		@Override
-		protected Void doInBackground(Void... params) {
+		private void doVerification() {
 			try {
 				long t0 = System.currentTimeMillis();
 				String rootFolderId = getFileId(FOLDER_SKYDRIVE, FOLDER_ROOT);
@@ -204,78 +247,41 @@ public class LiveServiceImpl extends AbstractServiceImpl implements LiveAuthList
 				Log.w(TAG, "Failed to write to local storage");
 				e.printStackTrace();
 			}
-			return null;
 		}
-	}
 
-	private void notifyBackendListeners() {
-		for (BackendFileServiceListener listener : backendListeners) {
-			listener.onBackendReady(this);
-		}
-	}
 
-	private void writeFileIdToStorage(String fileName, String fileId) throws FileNotFoundException {
-		final FileOutputStream fos = activity.openFileOutput(fileName, Context.MODE_PRIVATE);
-		final PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(fos));
-		printWriter.println(fileId);
-		printWriter.flush();
-		printWriter.close();
-	}
 
-	private String readFileIdFromStorage(String fileName) {
-		BufferedReader reader = null;
-		try {
-			final FileInputStream fis = activity.openFileInput(fileName);
-			reader = new BufferedReader(new InputStreamReader(fis));
-			return reader.readLine();
-		}
-		catch (IOException e) {
-			Log.w(TAG, "Failed to read fileID from local storage");
-			return null;
-		}
-		finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				}
-				catch (IOException e) {
-					//Ignore
+		private String getFileId(String parentFolderId, String folderName) throws LiveOperationException, JSONException {
+			final LiveOperation op = liveClient.get(parentFolderId + "/files/");
+			final JSONObject result = op.getResult();
+			JSONArray data = result.getJSONArray("data");
+			if (data == null) {
+				return null;
+				//TODO throw something?
+			}
+			for (int i = 0; i < data.length(); i++) {
+				JSONObject jsonObject = data.getJSONObject(i);
+				String name = jsonObject.getString("name");
+				if (folderName.equals(name)) {
+					return jsonObject.getString("id");
 				}
 			}
-		}
-	}
-
-	private String getFileId(String parentFolderId, String folderName) throws LiveOperationException, JSONException {
-		final LiveOperation op = liveClient.get(parentFolderId + "/files/");
-		final JSONObject result = op.getResult();
-		JSONArray data = result.getJSONArray("data");
-		if (data == null) {
 			return null;
-			//TODO throw something?
 		}
-		for (int i = 0; i < data.length(); i++) {
-			JSONObject jsonObject = data.getJSONObject(i);
-			String name = jsonObject.getString("name");
-			if (folderName.equals(name)) {
-				return jsonObject.getString("id");
-			}
+
+		private String createFolder(String parentFolderId, String folderName) throws LiveOperationException, JSONException {
+			JSONObject body = new JSONObject();
+			body.put("name", folderName);
+			final LiveOperation op = liveClient.post(parentFolderId, body);
+			return op.getResult().getString("id");
 		}
-		return null;
+
+		private String createFile(String parentFolderId, String fileName) throws LiveOperationException, JSONException {
+			JSONObject body = new JSONObject();
+			body.put("name", fileName);
+			final LiveOperation op = liveClient.put(parentFolderId + "/files/" + fileName, body);
+			return op.getResult().getString("id");
+		}
+
 	}
-
-	private String createFolder(String parentFolderId, String folderName) throws LiveOperationException, JSONException {
-		JSONObject body = new JSONObject();
-		body.put("name", folderName);
-		final LiveOperation op = liveClient.post(parentFolderId, body);
-		return op.getResult().getString("id");
-	}
-
-	private String createFile(String parentFolderId, String fileName) throws LiveOperationException, JSONException {
-		JSONObject body = new JSONObject();
-		body.put("name", fileName);
-		final LiveOperation op = liveClient.put(parentFolderId + "/files/" + fileName, body);
-		return op.getResult().getString("id");
-	}
-
-
 }

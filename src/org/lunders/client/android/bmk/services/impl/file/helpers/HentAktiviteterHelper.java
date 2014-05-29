@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk.services.impl.file;
+package org.lunders.client.android.bmk.services.impl.file.helpers;
 
 import android.content.Context;
 import android.os.Handler;
@@ -31,6 +31,7 @@ import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
 import org.lunders.client.android.bmk.model.lokasjon.Koordinater;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.yaml.snakeyaml.Yaml;
 
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class HentAktiviteterThread extends HandlerThread {
+public class HentAktiviteterHelper extends HandlerThread {
 
 	private Handler responseHandler;
 	private AktivitetService.AktivitetListener listener;
@@ -47,9 +48,9 @@ class HentAktiviteterThread extends HandlerThread {
 	private LiveConnectClient liveClient;
 	private String aktiviteterFileId;
 
-	private static final String TAG = HentAktiviteterThread.class.getSimpleName();
+	private static final String TAG = HentAktiviteterHelper.class.getSimpleName();
 
-	public HentAktiviteterThread(Context activity, LiveConnectClient liveClient, AktivitetService.AktivitetListener listener, String aktiviteterFileId) {
+	public HentAktiviteterHelper(Context activity, LiveConnectClient liveClient, AktivitetService.AktivitetListener listener, String aktiviteterFileId) {
 		super(TAG);
 		this.activity = activity;
 		this.liveClient = liveClient;

@@ -16,14 +16,13 @@
 
 package org.lunders.client.android.bmk.services;
 
-import android.os.Handler;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 
 import java.util.Collection;
 
 public interface NyhetService {
 
-	Collection<Nyhet> hentNyheter();
+	void hentNyheter(NyhetListener listener);
 
 	void hentNyhet(Nyhet nyhet, NyhetDetaljListener listener);
 
