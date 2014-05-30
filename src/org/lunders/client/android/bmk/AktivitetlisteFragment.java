@@ -30,7 +30,6 @@ import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.BackendFileService;
-import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.StringUtil;
@@ -41,7 +40,6 @@ import java.util.List;
 public class AktivitetlisteFragment extends ListFragment
 	implements BackendFileService.BackendFileServiceListener, AktivitetService.AktivitetListener {
 
-	private AktivitetService aktivitetService;
 	private BackendFileService backend;
 
 	private List<AbstractAktivitet> currentAktiviteter;
@@ -51,7 +49,6 @@ public class AktivitetlisteFragment extends ListFragment
 
 	public AktivitetlisteFragment() {
 		Log.i(TAG, "constructor");
-		aktivitetService = new AktivitetServiceImpl();
 	}
 
 

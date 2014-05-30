@@ -54,7 +54,6 @@ public class LiveServiceImpl implements LiveAuthListener, BackendFileService {
 	//Aktiviteten som eier denne tjenesten
 	private Context activity;
 
-	public static final String TWITTER_CACHE = "twitterCache";
 	public static final String AKTIVITET_CACHE = "aktivitetCache";
 
 	private static final String LIVE_CLIENT_ID = "000000004811DAAB";

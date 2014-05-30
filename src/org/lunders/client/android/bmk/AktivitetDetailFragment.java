@@ -71,6 +71,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 						@Override
 						public void onClick(View v) {
 							fireGoogleMaps(sted);
+							AktivitetDetailFragment.this.dismiss();
 						}
 					}
 				);

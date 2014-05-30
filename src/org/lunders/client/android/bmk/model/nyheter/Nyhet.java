@@ -16,6 +16,11 @@
 
 package org.lunders.client.android.bmk.model.nyheter;
 
+import android.text.Html;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,7 +28,7 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
     private String overskrift;
 
-    private transient CharSequence ingress;
+    private CharSequence ingress;
 
 	private Date dato;
 
@@ -31,7 +36,7 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
 	private String fullStoryURL;
 
-	private transient CharSequence fullStory;
+	private CharSequence fullStory;
 
 	public Nyhet() {
 
@@ -123,4 +128,23 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 		return fullStory;
 	}
 
+	private void writeObject(ObjectOutputStream stream)
+		throws IOException {
+		stream.writeObject(overskrift);
+		stream.writeObject(dato);
+		stream.writeObject(kilde);
+		stream.writeObject(fullStoryURL);
+		stream.writeObject(ingress != null ? ingress.toString() : null);
+		stream.writeObject(fullStory != null ? fullStory.toString() : null);
+	}
+
+	private void readObject(ObjectInputStream stream)
+		throws IOException, ClassNotFoundException {
+		overskrift = (String) stream.readObject();
+		dato = (Date) stream.readObject();
+		kilde = (Nyhetskilde) stream.readObject();
+		fullStoryURL = (String) stream.readObject();
+		ingress = Html.fromHtml((String)stream.readObject());
+		fullStory = Html.fromHtml((String) stream.readObject());
+	}
 }

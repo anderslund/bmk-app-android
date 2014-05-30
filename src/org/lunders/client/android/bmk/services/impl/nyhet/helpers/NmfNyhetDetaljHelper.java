@@ -64,19 +64,21 @@ public class NmfNyhetDetaljHelper implements Runnable {
 		try {
 			long t0 = System.currentTimeMillis();
 			String nyhetssideHtml = new String(ServiceHelper.hentRaadata(nyhet.getFullStoryURL()));
+			long t1 = System.currentTimeMillis();
+
 			int innholdStartIndex = nyhetssideHtml.indexOf(NMF_HTML_ARTICLE_HEADLINE);
 			int innholdEndIndex = nyhetssideHtml.indexOf("</div>", innholdStartIndex);
 
 			String innholdHtml = nyhetssideHtml.substring(
 				innholdStartIndex + NMF_HTML_ARTICLE_HEADLINE.length() + 1,
 				innholdEndIndex);
-			long t1 = System.currentTimeMillis();
+
 			String s = Jsoup.clean(innholdHtml, Whitelist.basic());
 			Spanned story = Html.fromHtml(s);
 			long t2 = System.currentTimeMillis();
 			nyhet.setFullStory(story);
 			long t3 = System.currentTimeMillis();
-			Log.i(TAG, "Hentet full story fra NMF på " + (t3 - t0) + "ms. HTML-parsing tok " + (t2 - t1) + "ms");
+			Log.i(TAG, "Hentet full story fra NMF på " + (t1 - t0) + "ms. HTML-parsing tok " + (t2 - t1) + "ms");
 		}
 		catch (IOException e) {
 			e.printStackTrace();

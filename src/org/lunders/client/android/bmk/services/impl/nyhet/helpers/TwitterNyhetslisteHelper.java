@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
@@ -27,8 +28,11 @@ import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImpl;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +40,7 @@ import java.util.Date;
 public class TwitterNyhetslisteHelper implements Runnable {
 
 	private Handler responseHandler;
+	private Context mContext;
 	private NyhetService.NyhetListener listener;
 	private Collection<Nyhet> nyheter;
 
@@ -46,7 +51,8 @@ public class TwitterNyhetslisteHelper implements Runnable {
 	private static final String TAG = TwitterNyhetslisteHelper.class.getSimpleName();
 
 
-	public TwitterNyhetslisteHelper(NyhetService.NyhetListener listener) {
+	public TwitterNyhetslisteHelper(Context context, NyhetService.NyhetListener listener) {
+		mContext = context;
 		this.listener = listener;
 		responseHandler = new Handler(Looper.getMainLooper());
 	}
@@ -54,9 +60,14 @@ public class TwitterNyhetslisteHelper implements Runnable {
 	@Override
 	public void run() {
 		Log.i(TAG, "Henter nyheter fra Twitter...");
+
+		//Fyrer av henting av nyheter fra Twitter i bakgrunnen
 		nyheter = doHentNyheter();
+		storeNyheterToStorage(nyheter);
+
 		Log.i(TAG, "Har hentet nyheter fra Twitter...");
 
+		//Her leverer vi resultatet fra baktrunnsjobben til UI-tråden.
 		responseHandler.post(
 			new Runnable() {
 				@Override
@@ -109,5 +120,18 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			e.printStackTrace();
 		}
 		return nyheter;
+	}
+
+	private void storeNyheterToStorage(Collection<Nyhet> aktiviteter) {
+		try {
+			final FileOutputStream fos = mContext.openFileOutput(TwitterNyhetServiceImpl.TWITTER_NYHET_CACHE, Context.MODE_PRIVATE);
+			final ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(aktiviteter);
+			oos.flush();
+			fos.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

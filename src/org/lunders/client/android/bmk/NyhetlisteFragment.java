@@ -51,16 +51,18 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 	public NyhetlisteFragment() {
 		Log.i(TAG, "constructor");
-		nyhetServices = Arrays.asList(
-			bmkWebNyhetService = new BMKWebNyhetServiceImpl(),
-			nmfNyhetService = new NmfNyhetServiceImpl(),
-			twitterNyhetService = new TwitterNyhetServiceImpl());
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
+
+		nyhetServices = Arrays.asList(
+			bmkWebNyhetService = new BMKWebNyhetServiceImpl(),
+			nmfNyhetService = new NmfNyhetServiceImpl(),
+			twitterNyhetService = new TwitterNyhetServiceImpl(getActivity()));
+		
 		setRetainInstance(true);
 
 		if (savedInstanceState != null) {
