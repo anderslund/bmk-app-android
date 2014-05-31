@@ -64,6 +64,13 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 			twitterNyhetService = new TwitterNyhetServiceImpl(getActivity()));
 		
 		setRetainInstance(true);
+	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		getListView().setDivider(null);
+		getListView().setDividerHeight(20);
 
 		if (savedInstanceState != null) {
 			currentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
@@ -80,14 +87,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		}
 
 		setListAdapter(new NyhetslisteAdapter(currentNyheter));
-
-	}
-
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		getListView().setDivider(null);
-		getListView().setDividerHeight(20);
 	}
 
 	@Override
@@ -101,7 +100,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
 
 		FragmentManager fm = getActivity().getSupportFragmentManager();
-		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(nyhet);
+		NyhetDetailFragment dialog = NyhetDetailFragment.newInstance(getActivity(), nyhet);
 
 		switch (nyhet.getKilde()) {
 			case BMK:

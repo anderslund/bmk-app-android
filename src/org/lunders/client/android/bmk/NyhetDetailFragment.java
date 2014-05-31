@@ -16,42 +16,50 @@
 
 package org.lunders.client.android.bmk;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
+import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 
 public class NyhetDetailFragment extends DialogFragment implements NyhetService.NyhetDetaljListener {
 
-	private View nyhetDetailView;
+	private Activity mActivity;
+	private View     mNyhetDetailView;
 
 	private static final String EXTRA_NYHET = "org.lunders.client.android.bmk.nyhet_detalj";
 
 	private static final String TAG = NyhetDetailFragment.class.getSimpleName();
 
+	private NyhetDetailFragment(Activity activity) {
+		mActivity = activity;
+	}
 
-	public static NyhetDetailFragment newInstance(Nyhet n) {
+	public static NyhetDetailFragment newInstance(Activity activity, Nyhet n) {
 		Bundle args = new Bundle();
 		args.putSerializable(EXTRA_NYHET, n);
 
-		NyhetDetailFragment fragment = new NyhetDetailFragment();
+		NyhetDetailFragment fragment = new NyhetDetailFragment(activity);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
 
 	private View getNyhetDetailView() {
-		if (nyhetDetailView == null) {
-			nyhetDetailView = getActivity().getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
+		if (mNyhetDetailView == null) {
+			mNyhetDetailView = mActivity.getLayoutInflater().inflate(R.layout.dialog_nyhet_detalj, null);
 		}
-		return nyhetDetailView;
+		return mNyhetDetailView;
 	}
 
 
@@ -59,8 +67,13 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 	public void onNyhetHentet(Nyhet nyheten) {
 		Log.i(TAG, "onNyhetHentet");
 		TextView nyhetslisteContent = (TextView) getNyhetDetailView().findViewById(R.id.nyhetContent);
-		nyhetslisteContent.setLinksClickable(true);
-		nyhetslisteContent.setAutoLinkMask(Linkify.WEB_URLS);
+		//nyhetslisteContent.setLinksClickable(true);
+		if (nyheten.getKilde() == Nyhetskilde.Twitter) {
+			nyhetslisteContent.setAutoLinkMask(Linkify.WEB_URLS);
+		}
+		else {
+			nyhetslisteContent.setMovementMethod(LinkMovementMethod.getInstance());
+		}
 		nyhetslisteContent.setText(nyheten.getFullStory());
 	}
 
@@ -70,12 +83,12 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 
 		Nyhet nyhet = (Nyhet) getArguments().getSerializable(EXTRA_NYHET);
 
-		nyhetDetailView = getNyhetDetailView();
+		mNyhetDetailView = getNyhetDetailView();
 
-		TextView nyhetsHeader = (TextView) nyhetDetailView.findViewById(R.id.nyhetHeader);
+		TextView nyhetsHeader = (TextView) mNyhetDetailView.findViewById(R.id.nyhetHeader);
 		nyhetsHeader.setText(nyhet.getOverskrift());
 
-		ImageView nyhetslisteIcon = (ImageView) nyhetDetailView.findViewById(R.id.nyhetIcon);
+		ImageView nyhetslisteIcon = (ImageView) mNyhetDetailView.findViewById(R.id.nyhetIcon);
 
 		int resourceId;
 		switch (nyhet.getKilde()) {
@@ -91,7 +104,7 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 		nyhetslisteIcon.setImageResource(resourceId);
 
 		Dialog theDialog = new AlertDialog.Builder(getActivity())
-			.setView(nyhetDetailView)
+			.setView(mNyhetDetailView)
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 

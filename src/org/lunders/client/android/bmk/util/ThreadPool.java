@@ -52,7 +52,7 @@ public class ThreadPool {
 
 		// Creates a thread pool manager
 		mThreadPool = new ThreadPoolExecutor(
-			NUMBER_OF_CORES,       // Initial pool size
+			Runtime.getRuntime().availableProcessors(),       // Initial pool size
 			MAXIMUM_POOL_SIZE,     // Max pool size
 			KEEP_ALIVE_TIME,
 			KEEP_ALIVE_TIME_UNIT,
