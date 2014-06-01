@@ -19,7 +19,6 @@ package org.lunders.client.android.bmk;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.method.LinkMovementMethod;
@@ -27,6 +26,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
@@ -66,7 +66,12 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 	@Override
 	public void onNyhetHentet(Nyhet nyheten) {
 		Log.i(TAG, "onNyhetHentet");
-		TextView nyhetslisteContent = (TextView) getNyhetDetailView().findViewById(R.id.nyhetContent);
+
+
+		ProgressBar prog = (ProgressBar) getNyhetDetailView().findViewById(R.id.nyhet_content_progress);
+		prog.setVisibility(View.GONE);
+
+		TextView nyhetslisteContent = (TextView) mNyhetDetailView.findViewById(R.id.nyhetContent);
 		//nyhetslisteContent.setLinksClickable(true);
 		if (nyheten.getKilde() == Nyhetskilde.Twitter) {
 			nyhetslisteContent.setAutoLinkMask(Linkify.WEB_URLS);
@@ -88,8 +93,13 @@ public class NyhetDetailFragment extends DialogFragment implements NyhetService.
 		TextView nyhetsHeader = (TextView) mNyhetDetailView.findViewById(R.id.nyhetHeader);
 		nyhetsHeader.setText(nyhet.getOverskrift());
 
-		ImageView nyhetslisteIcon = (ImageView) mNyhetDetailView.findViewById(R.id.nyhetIcon);
+		//Twitter-detaljer er allerede "lastet", så vi trenger ingen progress for det.
+		if (nyhet.getKilde() != Nyhetskilde.Twitter) {
+			ProgressBar prog = (ProgressBar) mNyhetDetailView.findViewById(R.id.nyhet_content_progress);
+			prog.setVisibility(View.VISIBLE);
+		}
 
+		ImageView nyhetslisteIcon = (ImageView) mNyhetDetailView.findViewById(R.id.nyhetIcon);
 		int resourceId;
 		switch (nyhet.getKilde()) {
 			case NMF:

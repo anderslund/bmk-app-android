@@ -55,6 +55,14 @@
       android:layout_toLeftOf="@id/nyhetIcon"
       android:layout_below="@id/nyhetHeader" />
 
+    <ProgressBar
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:visibility="gone"
+      android:id="@+id/nyhet_content_progress"
+      android:layout_below="@id/nyhetDato"
+      android:indeterminate="true"/>
+
     <TextView
       android:paddingTop="4dp"
       android:paddingLeft="8dp"
@@ -64,8 +72,7 @@
       android:id="@+id/nyhetContent"
       android:layout_toLeftOf="@id/nyhetIcon"
       android:textStyle="italic"
-      android:layout_below="@id/nyhetDato"
-      />
+      android:layout_below="@id/nyhet_content_progress" />
   </RelativeLayout>
 
 </FrameLayout>
