@@ -97,7 +97,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 				int timestampStartIndex = searchResultHtml.indexOf("data-time-ms=\"", authorEndIndex) + "data-time-ms=\"".length();
 				int timestampEndIndex = searchResultHtml.indexOf('"', timestampStartIndex);
 
-				String author = searchResultHtml.substring(authorStartIndex, authorEndIndex);
+				String author = Html.fromHtml(searchResultHtml.substring(authorStartIndex, authorEndIndex)).toString();
 				String substring = searchResultHtml.substring(contentStartIndex, contentEndIndex);
 				String sContent = Jsoup.clean(substring, Whitelist.basic());
 				sContent = sContent.replaceAll("&nbsp;", "");
@@ -107,7 +107,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 
 				String sTimestamp = searchResultHtml.substring(timestampStartIndex, timestampEndIndex);
 
-				Nyhet nyhet = new Nyhet(author, sContent, Nyhetskilde.Twitter);
+				Nyhet nyhet = new Nyhet(author, content, Nyhetskilde.Twitter);
 				nyhet.setFullStory(sContent);
 				try {
 					long timestamp = Long.parseLong(sTimestamp);
