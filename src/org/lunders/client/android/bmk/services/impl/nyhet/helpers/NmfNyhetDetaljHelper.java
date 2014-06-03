@@ -47,8 +47,13 @@ public class NmfNyhetDetaljHelper implements Runnable {
 
 	public void run() {
 		Log.i(TAG, "Henter full story fra NMF");
-		doHentNyhet();
-		Log.i(TAG, "Full story hentet fra NMF");
+		if ( nyhet.getFullStory() == null) {
+			doHentNyhet();
+			Log.i(TAG, "Full story hentet fra NMF");
+		}
+		else {
+			Log.i(TAG, "Story allerede hentet");
+		}
 
 		responseHandler.post(
 			new Runnable() {

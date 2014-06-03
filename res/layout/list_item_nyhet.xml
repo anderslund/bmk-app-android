@@ -20,59 +20,22 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
-  android:layout_height="?android:attr/listPreferredItemHeight">
+  android:layout_height="wrap_content">
 
-
-  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="8dp"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
-    android:background="@drawable/card_background">
+    android:background="@drawable/card_background"
+    android:orientation="vertical">
 
-    <ImageView
-      android:id="@+id/nyhetIcon"
-      android:layout_width="24sp"
-      android:layout_height="24sp"
-      android:layout_alignParentRight="true" />
+    <include layout="@layout/nyhet_header_section" />
 
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall"
-      android:id="@+id/nyhetHeader"
-      android:layout_toLeftOf="@id/nyhetIcon"
-      android:textStyle="bold" />
-
-    <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall"
-      android:id="@+id/nyhetDato"
-      android:layout_toLeftOf="@id/nyhetIcon"
-      android:layout_below="@id/nyhetHeader" />
-
-    <ProgressBar
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:visibility="gone"
-      android:id="@+id/nyhet_content_progress"
-      android:layout_below="@id/nyhetDato"
-      android:indeterminate="true"/>
-
-    <TextView
-      android:paddingTop="4dp"
-      android:paddingLeft="8dp"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:textAppearance="?android:attr/textAppearanceSmall"
-      android:id="@+id/nyhetContent"
-      android:layout_toLeftOf="@id/nyhetIcon"
-      android:textStyle="italic"
-      android:layout_below="@id/nyhet_content_progress" />
-  </RelativeLayout>
+    <include layout="@layout/nyhet_content_section"/>
+  </LinearLayout>
 
 </FrameLayout>

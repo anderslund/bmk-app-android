@@ -38,6 +38,8 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
 	private CharSequence fullStory;
 
+	private int listPosition;
+
 	public Nyhet() {
 
 	}
@@ -126,6 +128,14 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
 	public CharSequence getFullStory() {
 		return fullStory;
+	}
+
+	public int getListPosition() {
+		return listPosition;
+	}
+
+	public void setListPosition(int listPosition) {
+		this.listPosition = listPosition;
 	}
 
 	private void writeObject(ObjectOutputStream stream)
