@@ -19,6 +19,8 @@ package org.lunders.client.android.bmk;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,7 @@ import com.nhaarman.listviewanimations.itemmanipulation.ExpandCollapseListener;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
+import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.nyhet.BMKWebNyhetServiceImpl;
 import org.lunders.client.android.bmk.services.impl.nyhet.NmfNyhetServiceImpl;
@@ -79,6 +82,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 		if (savedInstanceState != null) {
 			currentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
+			onNyheterHentet(currentNyheter);
 		}
 
 		if (!currentNyheter.isEmpty()) {
@@ -89,53 +93,11 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 				nyhetService.hentNyheter(this);
 			}
 		}
-
-	}
-
-	@Override
-	public void onNyheterHentet(Collection<Nyhet> nyheter) {
-		System.out.println("onNyheterHentet");
-		currentNyheter.addAll(nyheter);
-
-
-		if (listAdapter == null) {
-			listAdapter = new NyhetslisteAdapter(getActivity(), currentNyheter);
-			alphaInAnimationAdapter = new AlphaInAnimationAdapter(listAdapter);
-			alphaInAnimationAdapter.setAbsListView(getListView());
-			alphaInAnimationAdapter.setInitialDelayMillis(500);
-			setListAdapter(alphaInAnimationAdapter);
-		}
-
-		listAdapter.clear();
-		listAdapter.addAll(currentNyheter);
-	}
-
-
-	@Override
-	public void onNyhetHentet(Nyhet nyheten) {
-		System.out.println("onNyhetHentet");
-
-//		View titleView = listAdapter.getTitleView(nyheten.getListPosition());
-//		if (titleView != null) {
-//			final View textViewIngress = titleView.findViewById(R.id.nyhetIngress);
-//			textViewIngress.setVisibility(View.GONE);
-//		}
-
-		View contentView = listAdapter.getContentView(nyheten.getListPosition());
-		if (contentView != null) {
-			final View progressBar = contentView.findViewById(R.id.nyhet_content_progress);
-			progressBar.setVisibility(View.GONE);
-
-			TextView textViewContent = (TextView) contentView.findViewById(R.id.nyhetContent);
-			textViewContent.setText(nyheten.getFullStory());
-			textViewContent.setVisibility(View.VISIBLE);
-		}
 	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 		Log.i(TAG, "onSaveInstanceState");
 		outState.putSerializable(getString(R.string.state_current_nyheter), (Serializable) currentNyheter);
 	}
@@ -146,7 +108,9 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		System.out.println("onItemExpanded");
 
 		View contentView = listAdapter.getContentView(position);
-		final View progressBar =  contentView.findViewById(R.id.nyhet_content_progress);
+		contentView.invalidate();
+
+		final View progressBar = contentView.findViewById(R.id.nyhet_content_progress);
 		progressBar.setVisibility(View.VISIBLE);
 
 		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
@@ -167,6 +131,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		}
 	}
 
+
 	@Override
 	public void onItemCollapsed(int position) {
 		Log.i(TAG, "onItemCollapsed");
@@ -184,10 +149,61 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 //		}
 	}
 
+
+	@Override
+	public void onNyheterHentet(Collection<Nyhet> nyheter) {
+		System.out.println("onNyheterHentet");
+		currentNyheter.addAll(nyheter);
+
+		if (listAdapter == null) {
+			listAdapter = new NyhetslisteAdapter(getActivity(), currentNyheter);
+			alphaInAnimationAdapter = new AlphaInAnimationAdapter(listAdapter);
+			alphaInAnimationAdapter.setAbsListView(getListView());
+			alphaInAnimationAdapter.setInitialDelayMillis(500);
+			setListAdapter(alphaInAnimationAdapter);
+		}
+
+		listAdapter.clear();
+		listAdapter.addAll(currentNyheter);
+	}
+
+
+	@Override
+	public void onNyhetHentet(Nyhet nyheten) {
+		System.out.println("onNyhetHentet");
+
+		View contentView = listAdapter.getContentView(nyheten.getListPosition());
+		if (contentView != null) {
+			displayNyhet(nyheten, contentView);
+
+			final View progressBar = contentView.findViewById(R.id.nyhet_content_progress);
+			progressBar.setVisibility(View.GONE);
+		}
+	}
+
+
+	private void displayNyhet(Nyhet nyheten, View contentView) {
+
+		TextView tv = (TextView) contentView.findViewById(R.id.nyhetContent);
+		tv.setVisibility(View.VISIBLE);
+
+		if (nyheten.getKilde() == Nyhetskilde.Twitter) {
+			tv.setAutoLinkMask(Linkify.WEB_URLS);
+			tv.setText(nyheten.getFullStory(),TextView.BufferType.SPANNABLE);
+		}
+		else {
+			tv.setText(nyheten.getFullStory(),TextView.BufferType.SPANNABLE);
+			tv.setMovementMethod(LinkMovementMethod.getInstance());
+		}
+	}
+
+
+
+
 	private class NyhetslisteAdapter extends ExpandableListItemAdapter<Nyhet> {
 
 		public NyhetslisteAdapter(Context context, Set<Nyhet> objects) {
-			super(context, R.layout.list_item_nyhet, R.id.nyhet_header_section, R.id.nyhet_content_section,  new ArrayList(objects));
+			super(context, R.layout.list_item_nyhet, R.id.nyhet_header_section, R.id.nyhet_content_section, new ArrayList(objects));
 			setLimit(1);
 			setExpandCollapseListener(NyhetlisteFragment.this);
 		}
@@ -228,11 +244,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 			if (convertView == null) {
 				convertView = getActivity().getLayoutInflater().inflate(R.layout.nyhet_content_section, null);
 			}
-
-			TextView nyhetslisteContent = (TextView) convertView.findViewById(R.id.nyhetContent);
-
-			Nyhet nyhet = getItem(position);
-			nyhetslisteContent.setText(nyhet.getIngress());
 			return convertView;
 		}
 	}

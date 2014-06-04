@@ -67,7 +67,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 
 		Log.i(TAG, "Har hentet nyheter fra Twitter...");
 
-		//Her leverer vi resultatet fra baktrunnsjobben til UI-tråden.
+		//Her leverer vi resultatet fra bakgrunnsjobben til UI-tråden.
 		responseHandler.post(
 			new Runnable() {
 				@Override
@@ -108,7 +108,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 				String sTimestamp = searchResultHtml.substring(timestampStartIndex, timestampEndIndex);
 
 				Nyhet nyhet = new Nyhet(author, content, Nyhetskilde.Twitter);
-				nyhet.setFullStory(sContent);
+				nyhet.setFullStory(content.toString());
 				try {
 					long timestamp = Long.parseLong(sTimestamp);
 					nyhet.setDato(new Date(timestamp));
@@ -126,11 +126,11 @@ public class TwitterNyhetslisteHelper implements Runnable {
 		return nyheter;
 	}
 
-	private void storeNyheterToStorage(Collection<Nyhet> aktiviteter) {
+	private void storeNyheterToStorage(Collection<Nyhet> nyheter) {
 		try {
 			final FileOutputStream fos = mContext.openFileOutput(TwitterNyhetServiceImpl.TWITTER_NYHET_CACHE, Context.MODE_PRIVATE);
 			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(aktiviteter);
+			oos.writeObject(nyheter);
 			oos.flush();
 			fos.close();
 		}
