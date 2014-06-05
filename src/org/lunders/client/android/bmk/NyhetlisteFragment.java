@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.nhaarman.listviewanimations.itemmanipulation.ExpandCollapseListener;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
@@ -41,27 +40,23 @@ import org.lunders.client.android.bmk.util.StringUtil;
 import java.io.Serializable;
 import java.util.*;
 
-public class NyhetlisteFragment extends ListFragment implements NyhetService.NyhetListener, ExpandCollapseListener, NyhetService.NyhetDetaljListener {
+public class NyhetlisteFragment extends ListFragment implements NyhetService.NyhetListener, NyhetService.NyhetDetaljListener {
 
 	private List<? extends NyhetService> nyhetServices;
 
 	private NyhetService bmkWebNyhetService, nmfNyhetService, twitterNyhetService;
+
+	private AlphaInAnimationAdapter alphaInAnimationAdapter;
+	private NyhetslisteAdapter      listAdapter;
 
 	private Set<Nyhet> currentNyheter;
 
 	public static final int PREVIEW_SIZE = 100;
 
 	private static final String TAG = NyhetlisteFragment.class.getSimpleName();
-	private AlphaInAnimationAdapter alphaInAnimationAdapter;
-	private NyhetslisteAdapter      listAdapter;
-
-	public NyhetlisteFragment() {
-		Log.i(TAG, "constructor");
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 
 		currentNyheter = new TreeSet<>();
@@ -96,65 +91,11 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		Log.i(TAG, "onSaveInstanceState");
 		outState.putSerializable(getString(R.string.state_current_nyheter), (Serializable) currentNyheter);
 	}
 
-
-	@Override
-	public void onItemExpanded(int position) {
-//		System.out.println("onItemExpanded " + position);
-//
-//		Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
-//		nyhet.setListPosition(position);
-//
-//		//Hvis vi allerede har lastet full story, returnerer vi tvert.
-//		if ( nyhet.getFullStory() != null) {
-//			onNyhetHentet(nyhet);
-//			return;
-//		}
-//
-//		View contentView = listAdapter.getContentView(position);
-//		View progressBar = contentView.findViewById(R.id.nyhet_content_progress);
-//		progressBar.setVisibility(View.VISIBLE);
-//
-//		switch (nyhet.getKilde()) {
-//			case BMK:
-//				bmkWebNyhetService.hentNyhet(nyhet, this);
-//				break;
-//
-//			case NMF:
-//				nmfNyhetService.hentNyhet(nyhet, this);
-//				break;
-//
-//			case Twitter:
-//				twitterNyhetService.hentNyhet(nyhet, this);
-//				break;
-//		}
-	}
-
-	@Override
-	public void onItemCollapsed(int position) {
-		//Log.i(TAG, "onItemCollapsed");
-//
-//		View titleView = listAdapter.getTitleView(position);
-//		if ( titleView != null) {
-//			final View textViewIngress = titleView.findViewById(R.id.nyhetIngress);
-//			textViewIngress.setVisibility(View.VISIBLE);
-//		}
-
-//		View contentView = listAdapter.getContentView(position);
-//		if ( contentView != null) {
-//			TextView textViewContent = (TextView) contentView.findViewById(R.id.nyhetContent);
-//			textViewContent.setVisibility(View.INVISIBLE);
-//			textViewContent.setText("");
-//		}
-	}
-
-
 	@Override
 	public void onNyheterHentet(Collection<Nyhet> nyheter) {
-		System.out.println("onNyheterHentet");
 		currentNyheter.addAll(nyheter);
 
 		if (listAdapter == null) {
@@ -172,34 +113,19 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 	@Override
 	public void onNyhetHentet(Nyhet nyheten) {
-		System.out.println("onNyhetHentet");
-
 		View contentView = listAdapter.getContentView(nyheten.getListPosition());
 		if (contentView != null) {
-			final View progressBar = contentView.findViewById(R.id.nyhet_content_progress);
-			progressBar.setVisibility(View.GONE);
-			displayNyhet(nyheten, contentView);
-		}
-		else {
-			System.out.println("Fant ikke content view");
-		}
-	}
+			TextView tv = (TextView) contentView.findViewById(R.id.nyhetContent);
 
-
-	private void displayNyhet(Nyhet nyheten, View contentView) {
-
-		TextView tv = (TextView) contentView.findViewById(R.id.nyhetContent);
-
-		if (nyheten.getKilde() == Nyhetskilde.Twitter) {
-			tv.setAutoLinkMask(Linkify.WEB_URLS);
-			tv.setText(nyheten.getFullStory());
+			if (nyheten.getKilde() == Nyhetskilde.Twitter) {
+				tv.setAutoLinkMask(Linkify.WEB_URLS);
+				tv.setText(nyheten.getFullStory());
+			}
+			else {
+				tv.setText(nyheten.getFullStory());
+				tv.setMovementMethod(LinkMovementMethod.getInstance());
+			}
 		}
-		else {
-			tv.setText(nyheten.getFullStory());
-			tv.setMovementMethod(LinkMovementMethod.getInstance());
-		}
-		//listAdapter.notifyDataSetChanged();
-		tv.setVisibility(View.VISIBLE);
 	}
 
 
@@ -208,8 +134,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 		public NyhetslisteAdapter(Context context, Set<Nyhet> objects) {
 			super(context, R.layout.list_item_nyhet, R.id.nyhet_header_section, R.id.nyhet_content_section, new ArrayList(objects));
-			setLimit(1);
-			setExpandCollapseListener(NyhetlisteFragment.this);
 		}
 
 		@Override
@@ -245,27 +169,12 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 		@Override
 		public View getContentView(int position, View convertView, ViewGroup parent) {
-
-			System.out.println("getContentView(" + position + ")");
 			if (convertView == null) {
-				System.out.println("Inflated view at position " + position);
 				convertView = getActivity().getLayoutInflater().inflate(R.layout.nyhet_content_section, null);
 			}
 
-
-			//View progressBar = convertView.findViewById(R.id.nyhet_content_progress);
-
 			Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
 			nyhet.setListPosition(position);
-
-			//Hvis vi allerede har lastet full story, returnerer vi tvert.
-//			if (nyhet.getFullStory() != null) {
-//				onNyhetHentet(nyhet);
-//				return convertView;
-//			}
-
-
-			//progressBar.setVisibility(View.VISIBLE);
 
 			switch (nyhet.getKilde()) {
 				case BMK:
@@ -280,7 +189,6 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 					twitterNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
 					break;
 			}
-
 			return convertView;
 		}
 	}
