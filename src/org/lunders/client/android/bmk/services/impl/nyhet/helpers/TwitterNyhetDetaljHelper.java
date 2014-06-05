@@ -40,7 +40,6 @@ public class TwitterNyhetDetaljHelper implements Runnable {
 	@Override
 	public void run() {
 		Log.i(TAG, "Trenger ikke å hente noe mer fra Twitter. \"Ingress\" og Story er samme sak.");
-
 		responseHandler.post(
 			new Runnable() {
 				@Override

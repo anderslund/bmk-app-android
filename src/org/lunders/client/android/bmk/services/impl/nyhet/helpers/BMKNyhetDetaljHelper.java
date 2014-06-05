@@ -47,8 +47,13 @@ public class BmkNyhetDetaljHelper implements Runnable {
 
 	public void run() {
 		Log.i(TAG, "Henter full story fra BMK");
-		doHentNyhet();
-		Log.i(TAG, "Full story hentet fra BMK");
+		if ( nyhet.getFullStory() == null) {
+			doHentNyhet();
+			Log.i(TAG, "Full story hentet fra BMK");
+		}
+		else {
+			Log.i(TAG, "Story allerede hentet");
+		}
 
 		//Sender melding til listener om at nyheten er hentet og klar for visning.
 		//En annen tråd (GUI-tråden) vil eksekvere denne koden.

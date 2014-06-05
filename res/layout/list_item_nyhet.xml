@@ -17,7 +17,10 @@
   ~ limitations under the License.
   -->
 
-
+<FrameLayout
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" >
 
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -25,8 +28,8 @@
     android:padding="8dp"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="10dp"
     android:background="@drawable/card_background"
     android:orientation="vertical">
 
@@ -35,3 +38,4 @@
     <include layout="@layout/nyhet_content_section" />
   </LinearLayout>
 
+</FrameLayout>
