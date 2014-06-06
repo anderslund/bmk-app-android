@@ -17,6 +17,7 @@
 package org.lunders.client.android.bmk.services.impl.aktivitet;
 
 import android.content.Context;
+import android.util.Log;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.impl.aktivitet.helpers.HentAktiviteterHelper;
@@ -61,7 +62,7 @@ public class AktivitetServiceImpl implements AktivitetService {
 			return (List<AbstractAktivitet>) ois.readObject();
 		}
 		catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			Log.w(TAG, "Ingenting i aktivitet-cache: " + e.getMessage());
 		}
 		return null;
 	}

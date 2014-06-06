@@ -17,6 +17,7 @@
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
 import android.content.Context;
+import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.nyhet.helpers.TwitterNyhetDetaljHelper;
@@ -32,6 +33,8 @@ public class TwitterNyhetServiceImpl implements NyhetService {
 
 	private Context mContext;
 	public static final String TWITTER_NYHET_CACHE = "twitterCache";
+
+	private static final String TAG = TwitterNyhetServiceImpl.class.getSimpleName();
 
 	public TwitterNyhetServiceImpl(Context context)  {
 		mContext = context;
@@ -69,7 +72,7 @@ public class TwitterNyhetServiceImpl implements NyhetService {
 			return nyheter;
 		}
 		catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			Log.w(TAG, "Ingenting i twitter-cache: " + e.getMessage());
 		}
 		return null;
 	}

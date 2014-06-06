@@ -36,7 +36,6 @@ import org.lunders.client.android.bmk.util.StringUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 public class AktivitetlisteFragment extends ListFragment implements AktivitetService.AktivitetListener {
 
@@ -68,7 +67,7 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 		getListView().setDividerHeight(20);
 
 		if (savedInstanceState != null) {
-			mCurrentAktiviteter = (Set<AbstractAktivitet>) savedInstanceState.getSerializable(getString(R.string.state_current_aktiviteter));
+			mCurrentAktiviteter = (Collection<AbstractAktivitet>) savedInstanceState.getSerializable(getString(R.string.state_current_aktiviteter));
 			onAktiviteterHentet(mCurrentAktiviteter);
 		}
 
