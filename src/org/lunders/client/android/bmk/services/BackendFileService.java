@@ -18,6 +18,8 @@ package org.lunders.client.android.bmk.services;
 
 public interface BackendFileService {
 
+	void connect();
+
 	void addBackendListener(BackendFileServiceListener listener);
 
 	void removeBackendListener(BackendFileServiceListener listener);

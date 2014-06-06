@@ -35,14 +35,15 @@ import java.util.Collection;
 
 public class NmfNyhetListeHelper implements Runnable {
 
-	private Handler responseHandler;
+	private Handler           responseHandler;
 	private NyhetService.NyhetListener listener;
 	private Collection<Nyhet> nyheter;
 
 	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
+	public static final String NMF_ENCODING = "UTF-8";
 
 	private static final String TAG = NmfNyhetListeHelper.class.getSimpleName();
-	public static final String NMF_ENCODING = "UTF-8";
+
 
 	public NmfNyhetListeHelper(NyhetService.NyhetListener listener) {
 		this.listener = listener;

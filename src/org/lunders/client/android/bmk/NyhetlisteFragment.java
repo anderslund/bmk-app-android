@@ -66,7 +66,7 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 			nmfNyhetService = new NmfNyhetServiceImpl(),
 			twitterNyhetService = new TwitterNyhetServiceImpl(getActivity()));
 
-		setRetainInstance(true);
+		//setRetainInstance(true);
 	}
 
 	@Override
@@ -119,12 +119,11 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 			if (nyheten.getKilde() == Nyhetskilde.Twitter) {
 				tv.setAutoLinkMask(Linkify.WEB_URLS);
-				tv.setText(nyheten.getFullStory());
 			}
 			else {
-				tv.setText(nyheten.getFullStory());
 				tv.setMovementMethod(LinkMovementMethod.getInstance());
 			}
+			tv.setText(nyheten.getFullStory(), TextView.BufferType.SPANNABLE);
 		}
 	}
 
@@ -169,9 +168,8 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 		@Override
 		public View getContentView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getActivity().getLayoutInflater().inflate(R.layout.nyhet_content_section, null);
-			}
+
+			convertView = getActivity().getLayoutInflater().inflate(R.layout.nyhet_content_section, null);
 
 			Nyhet nyhet = (Nyhet) getListAdapter().getItem(position);
 			nyhet.setListPosition(position);

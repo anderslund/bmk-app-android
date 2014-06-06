@@ -16,26 +16,54 @@
 
 package org.lunders.client.android.bmk.services.impl.aktivitet;
 
-import android.util.Log;
+import android.content.Context;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.impl.aktivitet.helpers.HentAktiviteterHelper;
+import org.lunders.client.android.bmk.util.ThreadPool;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Collection;
 import java.util.List;
 
 public class AktivitetServiceImpl implements AktivitetService {
 
-	private static final String TAG = AktivitetServiceImpl.class.getSimpleName();
+	private Context mContext;
+
+	public static final  String AKTIVITET_CACHE = "aktivitetCache";
+	private static final String TAG             = AktivitetServiceImpl.class.getSimpleName();
+
+
+	public AktivitetServiceImpl(Context context) {
+		mContext = context;
+	}
 
 
 	@Override
-	public List<AbstractAktivitet> hentAktiviteter(Date tilDato) {
-		Log.i(TAG, "Henter aktiviteter fra OneDrive...");
+	public void hentAktiviteter(AktivitetListener listener) {
+		ThreadPool.getInstance().execute(new HentAktiviteterHelper(mContext, listener));
 
-		List l = new ArrayList();
+		//Henter aktiviteter fra lokalt lager
+		Collection<AbstractAktivitet> cachedAktiviteter = loadAktiviteterFromStorage();
 
-		Log.i(TAG, "Aktiviteter hentet");
-		return l;
+		//Dersom vi fikk noe fra lokalt lager, så sier vi fra om det.
+		if (cachedAktiviteter != null && !cachedAktiviteter.isEmpty()) {
+			listener.onAktiviteterHentet(cachedAktiviteter);
+		}
 	}
+
+	private List<AbstractAktivitet> loadAktiviteterFromStorage() {
+		try {
+			final FileInputStream fis = mContext.openFileInput(AKTIVITET_CACHE);
+			final ObjectInputStream ois = new ObjectInputStream(fis);
+			return (List<AbstractAktivitet>) ois.readObject();
+		}
+		catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 }

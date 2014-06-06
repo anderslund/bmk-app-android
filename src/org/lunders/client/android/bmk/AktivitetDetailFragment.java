@@ -64,7 +64,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 			tvSted.setText(sted.getNavn());
 			if (sted.getKoordinater() != null) {
 				tvSted.setClickable(true);
-				tvSted.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+				tvSted.setTextColor(0xff33b5e5);
 				tvSted.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
 				tvSted.setOnClickListener(
 					new View.OnClickListener() {

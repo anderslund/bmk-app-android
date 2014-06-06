@@ -26,13 +26,13 @@ import java.util.Date;
 
 public class Nyhet implements Serializable, Comparable<Nyhet> {
 
-    private String overskrift;
+	private String overskrift;
 
-    private CharSequence ingress;
+	private CharSequence ingress;
 
 	private Date dato;
 
-    private Nyhetskilde kilde;
+	private Nyhetskilde kilde;
 
 	private String fullStoryURL;
 
@@ -45,10 +45,10 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 	}
 
 	public Nyhet(String overskrift, CharSequence ingress, Nyhetskilde kilde) {
-        this.overskrift = overskrift;
-        this.ingress = ingress;
-        this.kilde = kilde;
-    }
+		this.overskrift = overskrift;
+		this.ingress = ingress;
+		this.kilde = kilde;
+	}
 
 	public void setOverskrift(String overskrift) {
 		this.overskrift = overskrift;
@@ -63,16 +63,16 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 	}
 
 	public String getOverskrift() {
-        return overskrift;
-    }
+		return overskrift;
+	}
 
-    public CharSequence getIngress() {
-        return ingress;
-    }
+	public CharSequence getIngress() {
+		return ingress;
+	}
 
-    public Nyhetskilde getKilde() {
-        return kilde;
-    }
+	public Nyhetskilde getKilde() {
+		return kilde;
+	}
 
 	public String getFullStoryURL() {
 		return fullStoryURL;
@@ -97,7 +97,7 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
 	@Override
 	public int compareTo(Nyhet another) {
-		if ( dato == null || another.dato == null) {
+		if (dato == null || another.dato == null) {
 			//Gjør at nyheter hvor vi ikke fant dato, sorterer foran de med dato
 			return 1;
 		}
@@ -108,8 +108,8 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 
 	@Override
 	public boolean equals(Object o) {
-		if ( o != null && o instanceof Nyhet) {
-			Nyhet other = (Nyhet)o;
+		if (o != null && o instanceof Nyhet) {
+			Nyhet other = (Nyhet) o;
 			return kilde == other.kilde && overskrift.equals(other.overskrift);
 		}
 		return false;
@@ -154,7 +154,11 @@ public class Nyhet implements Serializable, Comparable<Nyhet> {
 		dato = (Date) stream.readObject();
 		kilde = (Nyhetskilde) stream.readObject();
 		fullStoryURL = (String) stream.readObject();
-		ingress = Html.fromHtml((String)stream.readObject());
-		fullStory = Html.fromHtml((String) stream.readObject());
+
+		Object oIngress = stream.readObject();
+		ingress = oIngress == null ? null : Html.fromHtml((String) oIngress);
+
+		Object oFullStory = stream.readObject();
+		fullStory = oFullStory == null ? null : Html.fromHtml((String) oFullStory);
 	}
 }

@@ -29,20 +29,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
-import org.lunders.client.android.bmk.services.BackendFileService;
-import org.lunders.client.android.bmk.services.impl.file.LiveServiceImpl;
+import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
-public class AktivitetlisteFragment extends ListFragment
-	implements BackendFileService.BackendFileServiceListener, AktivitetService.AktivitetListener {
+public class AktivitetlisteFragment extends ListFragment implements AktivitetService.AktivitetListener {
 
-	private BackendFileService backend;
-
-	private List<AbstractAktivitet> currentAktiviteter;
+	private AktivitetService                mAktivitetService;
+	private Collection<AbstractAktivitet>   mCurrentAktiviteter;
+	private ArrayAdapter<AbstractAktivitet> mListAdapter;
 
 	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
 
@@ -56,19 +56,8 @@ public class AktivitetlisteFragment extends ListFragment
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
-
-		backend = LiveServiceImpl.getInstance(getActivity());
-		backend.addBackendListener(this);
-
-		if (savedInstanceState != null) {
-			currentAktiviteter = (List<AbstractAktivitet>) savedInstanceState.getSerializable(getString(R.string.state_current_aktiviteter));
-		}
-
-		if (currentAktiviteter != null) {
-			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
-			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(getActivity(), currentAktiviteter);
-			setListAdapter(adapter);
-		}
+		mCurrentAktiviteter = new ArrayList<>();
+		mAktivitetService = new AktivitetServiceImpl(getActivity());
 	}
 
 
@@ -77,30 +66,43 @@ public class AktivitetlisteFragment extends ListFragment
 		super.onViewCreated(view, savedInstanceState);
 		getListView().setDivider(null);
 		getListView().setDividerHeight(20);
+
+		if (savedInstanceState != null) {
+			mCurrentAktiviteter = (Set<AbstractAktivitet>) savedInstanceState.getSerializable(getString(R.string.state_current_aktiviteter));
+			onAktiviteterHentet(mCurrentAktiviteter);
+		}
+
+		if (!mCurrentAktiviteter.isEmpty()) {
+			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
+		}
+		else {
+			mAktivitetService.hentAktiviteter(this);
+		}
 	}
 
-	@Override
-	public void onBackendReady(BackendFileService backend) {
-		backend.hentAktiviteter(this);
-	}
 
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		Log.i(TAG, "onSaveInstanceState");
-		outState.putSerializable(getString(R.string.state_current_aktiviteter), (Serializable) currentAktiviteter);
+		outState.putSerializable(getString(R.string.state_current_aktiviteter), (Serializable) mCurrentAktiviteter);
 	}
 
 
 	@Override
-	public void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter) {
+	public void onAktiviteterHentet(Collection<AbstractAktivitet> aktiviteter) {
 		Log.i(TAG, "onAktiviteterHentet");
-		currentAktiviteter = aktiviteter;
-		Context c = getActivity();
-		if (c != null) {
-			ArrayAdapter<AbstractAktivitet> adapter = new AktivitetlisteAdapter(c, currentAktiviteter);
-			setListAdapter(adapter);
+		mCurrentAktiviteter.clear();
+		mCurrentAktiviteter.addAll(aktiviteter);
+
+		if (mListAdapter == null) {
+			Context c = getActivity();
+			mListAdapter = new AktivitetlisteAdapter(c, mCurrentAktiviteter);
+			setListAdapter(mListAdapter);
 		}
+
+		mListAdapter.clear();
+		mListAdapter.addAll(mCurrentAktiviteter);
 	}
 
 
@@ -118,8 +120,8 @@ public class AktivitetlisteFragment extends ListFragment
 
 	private class AktivitetlisteAdapter extends ArrayAdapter<AbstractAktivitet> {
 
-		public AktivitetlisteAdapter(Context c, List<AbstractAktivitet> objects) {
-			super(c, 0, objects);
+		public AktivitetlisteAdapter(Context c, Collection<AbstractAktivitet> objects) {
+			super(c, 0, new ArrayList(objects));
 		}
 
 		@Override

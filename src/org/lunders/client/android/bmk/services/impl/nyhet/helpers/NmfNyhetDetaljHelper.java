@@ -19,7 +19,6 @@ package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -67,9 +66,7 @@ public class NmfNyhetDetaljHelper implements Runnable {
 
 	private void doHentNyhet() {
 		try {
-			long t0 = System.currentTimeMillis();
 			String nyhetssideHtml = new String(ServiceHelper.hentRaadata(nyhet.getFullStoryURL()));
-			long t1 = System.currentTimeMillis();
 
 			int innholdStartIndex = nyhetssideHtml.indexOf(NMF_HTML_ARTICLE_HEADLINE);
 			int innholdEndIndex = nyhetssideHtml.indexOf("</div>", innholdStartIndex);
@@ -79,11 +76,7 @@ public class NmfNyhetDetaljHelper implements Runnable {
 				innholdEndIndex);
 
 			String s = Jsoup.clean(innholdHtml, Whitelist.basic());
-			Spanned story = Html.fromHtml(s);
-			long t2 = System.currentTimeMillis();
-			nyhet.setFullStory(story);
-			long t3 = System.currentTimeMillis();
-			Log.i(TAG, "Hentet full story fra NMF på " + (t1 - t0) + "ms. HTML-parsing tok " + (t2 - t1) + "ms");
+			nyhet.setFullStory(Html.fromHtml(s));
 		}
 		catch (IOException e) {
 			e.printStackTrace();

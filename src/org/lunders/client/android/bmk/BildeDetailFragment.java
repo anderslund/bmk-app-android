@@ -30,13 +30,13 @@ import org.lunders.client.android.bmk.services.BildeService;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 
-public class BildeDetailFragment extends DialogFragment implements DownloadListener<ImageView>{
+public class BildeDetailFragment extends DialogFragment implements DownloadListener<ImageView> {
 
 	private Bilde bilde;
 
 	private ImageDownloader<ImageView> imageDownloader;
-	private Handler imageResponseHandler;
-	private BildeService bildeService;
+	private Handler                    imageResponseHandler;
+	private BildeService               bildeService;
 
 	public static BildeDetailFragment newInstance(BildeService bildeService, Bilde b) {
 		BildeDetailFragment fragment = new BildeDetailFragment(bildeService, b);
@@ -59,7 +59,7 @@ public class BildeDetailFragment extends DialogFragment implements DownloadListe
 	}
 
 	public void onImageDownloaded(ImageView imageView, Bilde image) {
-		imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
+		//imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 		byte[] fullSizeBytes = image.getFullSizeBytes();
 		imageView.setImageBitmap(BitmapFactory.decodeByteArray(fullSizeBytes, 0, fullSizeBytes.length));
 		imageView.getLayoutParams().height = imageView.getMeasuredWidth();

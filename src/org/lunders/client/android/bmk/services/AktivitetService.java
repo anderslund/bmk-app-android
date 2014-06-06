@@ -18,13 +18,12 @@ package org.lunders.client.android.bmk.services;
 
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Collection;
 
 public interface AktivitetService {
-    List<AbstractAktivitet> hentAktiviteter(Date tilDato);
+	void hentAktiviteter(AktivitetListener listener);
 
 	static interface AktivitetListener {
-		void onAktiviteterHentet(List<AbstractAktivitet> aktiviteter);
+		void onAktiviteterHentet(Collection<AbstractAktivitet> aktiviteter);
 	}
 }

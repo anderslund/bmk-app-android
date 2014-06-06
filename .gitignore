@@ -1,3 +1,7 @@
 out
 gen
 .idea
+*.iml
+*.apk
+
+proguard_logs

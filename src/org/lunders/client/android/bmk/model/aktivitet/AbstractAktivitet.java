@@ -91,10 +91,12 @@ public abstract class AbstractAktivitet implements Comparable<AbstractAktivitet>
 
 	@Override
 	public int compareTo(AbstractAktivitet another) {
-		if (tidspunktStart != null) {
+		if (tidspunktStart != null && another.tidspunktStart != null) {
 			return tidspunktStart.compareTo(another.tidspunktStart);
 		}
 		return 0;
 	}
+
+
 
 }
