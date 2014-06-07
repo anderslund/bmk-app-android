@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.aktivitet.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.UiUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileOutputStream;
@@ -68,7 +70,9 @@ public class HentAktiviteterHelper implements Runnable {
 		Log.i(TAG, "Henter aktiviteter fra GitHub...");
 
 		doHentAktiviteter();
-		storeAktiviteterToStorage(mCurrentAktiviteter);
+		if (mCurrentAktiviteter != null) {
+			storeAktiviteterToStorage(mCurrentAktiviteter);
+		}
 		mResponseHandler.post(
 			new Runnable() {
 				@Override
@@ -87,7 +91,7 @@ public class HentAktiviteterHelper implements Runnable {
 			aktiviteterYaml = new String(ServiceHelper.hentRaadata(GITHUB_AKTIVITETER), AKTIVITETER_ENCODING);
 		}
 		catch (IOException e) {
-			Toast.makeText(mContext, R.string.aktivitet_feil, Toast.LENGTH_LONG).show();
+			UiUtil.showToast((Activity) mContext, R.string.aktivitet_feil, Toast.LENGTH_LONG);
 			return;
 		}
 

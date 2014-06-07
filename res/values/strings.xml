@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2014 Anders Lund
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,4 +27,5 @@
   <string name="twitter_nyheter_feil">Klarte ikke å hente nyheter fra Twitter</string>
   <string name="nmf_nyheter_feil">Klarte ikke å hente nyheter fra NMF</string>
   <string name="bmk_nyheter_feil">Klarte ikke å hente nyheter fra BMK</string>
+  <string name="instagram_feil">Klarte ikke å hente bilder fra Instagram</string>
 </resources>

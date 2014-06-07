@@ -166,7 +166,7 @@ public class NyhetActivity extends FragmentActivity {
 							return new AktivitetlisteFragment();
 
 						default:
-							return new BildeFragment();
+							return new BildeFragment(NyhetActivity.this);
 					}
 				}
 

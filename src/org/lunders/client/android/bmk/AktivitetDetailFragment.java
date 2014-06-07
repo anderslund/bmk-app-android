@@ -36,6 +36,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 	private AbstractAktivitet mAktivitet;
 
 	public static final String EXTRA_AKTIVITET = "org.lunders.client.android.bmk.aktivitet_detalj";
+	public static final int COLOR_LINK_TEXT = 0xff33b5e5;
 
 
 	public static AktivitetDetailFragment newInstance(AbstractAktivitet a) {
@@ -65,7 +66,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 			tvSted.setText(sted.getNavn());
 			if (sted.getKoordinater() != null) {
 				tvSted.setClickable(true);
-				tvSted.setTextColor(0xff33b5e5);
+				tvSted.setTextColor(COLOR_LINK_TEXT);
 				tvSted.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
 				tvSted.setOnClickListener(
 					new View.OnClickListener() {

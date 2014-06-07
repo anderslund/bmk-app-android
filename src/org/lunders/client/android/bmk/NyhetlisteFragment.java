@@ -95,6 +95,10 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 	@Override
 	public void onNyheterHentet(Collection<Nyhet> nyheter) {
+		if (nyheter == null) {
+			return;
+		}
+
 		mCurrentNyheter.addAll(nyheter);
 
 		if (mListAdapter == null) {

@@ -16,6 +16,8 @@
 
 package org.lunders.client.android.bmk;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceHelper;
+import org.lunders.client.android.bmk.util.UiUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,16 +42,17 @@ import java.util.List;
 
 public class BildeFragment extends Fragment {
 
-	private InstagramBildeServiceHelper instagramBildeService;
-	private List<Bilde> currentBilder;
-	private GridView    gridView;
-
-	private ImageDownloader<ImageView> imageDownloader;
+	private InstagramBildeServiceHelper mInstagramBildeService;
+	private List<Bilde>                 mCurrentBilder;
+	private GridView                    mGridView;
+	private Context                     mContext;
+	private ImageDownloader<ImageView>  mImageDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 
-	public BildeFragment() {
-		instagramBildeService = new InstagramBildeServiceHelper();
+	public BildeFragment(Context context) {
+		mContext = context;
+		mInstagramBildeService = new InstagramBildeServiceHelper();
 		setupImageDownloader();
 	}
 
@@ -58,11 +62,11 @@ public class BildeFragment extends Fragment {
 		setRetainInstance(true);
 
 		if (savedInstanceState != null) {
-			currentBilder = (List<Bilde>) savedInstanceState.getSerializable(getString(R.string.state_current_bilder));
+			mCurrentBilder = (List<Bilde>) savedInstanceState.getSerializable(getString(R.string.state_current_bilder));
 		}
 
 		// Hvis vi ikke fant bilder i state, må vi laste på nytt
-		if (currentBilder == null || currentBilder.isEmpty()) {
+		if (mCurrentBilder == null || mCurrentBilder.isEmpty()) {
 			new GetAvailblePicturesTask().execute();
 		}
 	}
@@ -73,8 +77,8 @@ public class BildeFragment extends Fragment {
 		//Den har en meldingskø som looperen plukker ut URLer fra.
 		//Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
 		//Handleren her assosieres med den tråden som oppretter den (dvs UI-tråden)
-		imageDownloader = new ImageDownloader<>();
-		imageDownloader.setDownloadListener(
+		mImageDownloader = new ImageDownloader<>();
+		mImageDownloader.setDownloadListener(
 			new DownloadListener<ImageView>() {
 				@Override
 				public void onImageDownloaded(ImageView imageView, Bilde thumbnail) {
@@ -85,8 +89,8 @@ public class BildeFragment extends Fragment {
 				}
 			}
 		);
-		imageDownloader.start();
-		imageDownloader.getLooper();
+		mImageDownloader.start();
+		mImageDownloader.getLooper();
 	}
 
 	@Override
@@ -94,13 +98,13 @@ public class BildeFragment extends Fragment {
 		super.onDestroy();
 
 		//Stopper tråden. Dette er viktig, ellers vil Android fortsette å kjøre den i bakgrunnen til enheten restartes.
-		imageDownloader.quit();
+		mImageDownloader.quit();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_bilder, container, false);
-		gridView = (GridView) v.findViewById(R.id.gridView);
+		mGridView = (GridView) v.findViewById(R.id.gridView);
 
 		//SetupAdapter kjøres både når viewet creates (for å vise placeholdere for bilder) og fra onPostExecute
 		//i GetAvailablePicturesTast når den er ferdig med å laste URLer.
@@ -111,26 +115,26 @@ public class BildeFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		imageDownloader.clearQueue();
+		mImageDownloader.clearQueue();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putSerializable(getString(R.string.state_current_bilder), (Serializable) currentBilder);
+		outState.putSerializable(getString(R.string.state_current_bilder), (Serializable) mCurrentBilder);
 	}
 
 
 	private void setupAdapter() {
-		if (getActivity() == null || gridView == null) {
+		if (getActivity() == null || mGridView == null) {
 			return;
 		}
 
-		if (currentBilder != null) {
-			gridView.setAdapter(new BildeAdapter(currentBilder));
+		if (mCurrentBilder != null) {
+			mGridView.setAdapter(new BildeAdapter(mCurrentBilder));
 		}
 		else {
-			gridView.setAdapter(null);
+			mGridView.setAdapter(null);
 		}
 	}
 
@@ -157,8 +161,8 @@ public class BildeFragment extends Fragment {
 			else {
 				imageView.setImageResource(R.drawable.trumpet_icon);
 
-				if (imageDownloader != null) {
-					imageDownloader.queueImage(imageView, b, ImageDownloader.ImageType.THUMBNAIL);
+				if (mImageDownloader != null) {
+					mImageDownloader.queueImage(imageView, b, ImageDownloader.ImageType.THUMBNAIL);
 				}
 			}
 
@@ -187,17 +191,17 @@ public class BildeFragment extends Fragment {
 		protected List<Bilde> doInBackground(Void... params) {
 
 			try {
-				return instagramBildeService.hentBilder();
+				return mInstagramBildeService.hentBilder();
 			}
-			catch (IOException e) {
-				Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG);
+			catch (final IOException e) {
+				UiUtil.showToast((Activity) mContext, R.string.instagram_feil, Toast.LENGTH_LONG);
 				return null;
 			}
 		}
 
 		@Override
 		protected void onPostExecute(List<Bilde> abilder) {
-			currentBilder = abilder;
+			mCurrentBilder = abilder;
 			setupAdapter();
 		}
 	}

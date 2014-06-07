@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImpl;
 import org.lunders.client.android.bmk.util.NetworkUtils;
+import org.lunders.client.android.bmk.util.UiUtil;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -91,7 +93,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			searchResultHtml = new String(ServiceHelper.hentRaadata(TWITTER_SEARCH_URL), TWITTER_ENCODING);
 		}
 		catch (IOException e) {
-			Toast.makeText(mContext, mContext.getString(R.string.twitter_nyheter_feil), Toast.LENGTH_LONG).show();
+			UiUtil.showToast((Activity) mContext, R.string.twitter_nyheter_feil, Toast.LENGTH_LONG);
 			Log.e(TAG, "Klarte ikke å hente nyheter fra Twitter", e);
 			return null;
 		}
@@ -148,7 +150,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			fos.close();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			Log.w(TAG, "Klarte ikke å lagre nyheter lokalt", e);
 		}
 	}
 }

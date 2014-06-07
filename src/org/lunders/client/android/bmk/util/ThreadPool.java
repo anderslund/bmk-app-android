@@ -34,10 +34,6 @@ public class ThreadPool {
 
 	private static final int MAXIMUM_POOL_SIZE = 8;
 
-	public static final int UNDEFINED = Integer.MIN_VALUE;
-	public static final int FAILURE = 1;
-	public static final int SUCCESS = 0;
-
 
 	private ThreadPool() {
 
