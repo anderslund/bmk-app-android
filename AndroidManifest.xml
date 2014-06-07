@@ -27,7 +27,8 @@
     android:label="@string/app_title"
     android:theme="@android:style/Theme.Holo.Light"
     android:icon="@drawable/bmk_logo_transparent"
-    android:largeHeap="true">
+    android:largeHeap="true"
+    android:allowBackup="false">
   <activity android:name=".NyhetActivity"
               android:label="@string/header_main">
       <intent-filter>

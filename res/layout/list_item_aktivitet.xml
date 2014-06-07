@@ -54,7 +54,6 @@
       android:layout_toLeftOf="@id/aktivitetListIcon"
       android:layout_below="@id/aktivitetListHeader"
       android:visibility="gone"
-      android:editable="false"
       android:clickable="false" />
 
     <TextView
