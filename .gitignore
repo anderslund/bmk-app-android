@@ -3,5 +3,5 @@ gen
 .idea
 *.iml
 *.apk
-
+bin
 proguard_logs
