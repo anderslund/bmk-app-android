@@ -16,8 +16,6 @@
 
 package org.lunders.client.android.bmk.util;
 
-import android.os.Handler;
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -34,13 +32,6 @@ public class ThreadPool {
 
 	private static final ThreadPool sINSTANCE = new ThreadPool();
 
-
-	/*
-	 * Gets the number of available cores
-     * (not always the same as the maximum number of cores)
-     */
-	private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-
 	private static final int MAXIMUM_POOL_SIZE = 8;
 
 	public static final int UNDEFINED = Integer.MIN_VALUE;
@@ -52,8 +43,8 @@ public class ThreadPool {
 
 		// Creates a thread pool manager
 		mThreadPool = new ThreadPoolExecutor(
-			Runtime.getRuntime().availableProcessors(),       // Initial pool size
-			MAXIMUM_POOL_SIZE,     // Max pool size
+			Runtime.getRuntime().availableProcessors(),
+			MAXIMUM_POOL_SIZE,
 			KEEP_ALIVE_TIME,
 			KEEP_ALIVE_TIME_UNIT,
 			new LinkedBlockingQueue<Runnable>());
@@ -65,17 +56,5 @@ public class ThreadPool {
 
 	public void execute(Runnable r) {
 		mThreadPool.execute(r);
-	}
-
-	public static class TaskWrapper {
-		private Runnable theTask;
-		private Handler responseHandler;
-		private int taskType;
-
-		public TaskWrapper(Runnable r, Handler h, int taskType) {
-			this.theTask = r;
-			this.responseHandler = h;
-			this.taskType = taskType;
-		}
 	}
 }

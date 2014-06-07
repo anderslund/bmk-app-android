@@ -16,13 +16,17 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.IOException;
@@ -37,42 +41,47 @@ import java.util.regex.Pattern;
 
 public class BmkNyhetListeHelper implements Runnable {
 
-	private Handler responseHandler;
-	private NyhetService.NyhetListener listener;
-	private Collection<Nyhet> nyheter;
+	private Handler                    mResponseHandler;
+	private NyhetService.NyhetListener mListener;
+	private Collection<Nyhet>          mNyheter;
+	private Context                    mContext;
+	private NetworkUtils               mNetworkUtils;
 
-	private static final String BMK_NEWS_PAGE = "default.asp?fid=1001";
-	private static final Pattern REGEX_DATO = Pattern.compile("[a-zA-Z]*(\\d{1,2}\\.\\s*[a-zA-Z]*).*");
-	private static final String BMK_WEB_ROOT = "http://borgemusikken.no/";
-	private static final String BMK_HTML_NEWS_HEADLINE = "class=\"ListTemp_Title\"";
-	static final String BMK_ENCODING = "ISO-8859-1";
+	private static final String  BMK_NEWS_PAGE          = "default.asp?fid=1001";
+	private static final Pattern REGEX_DATO             = Pattern.compile("[a-zA-Z]*(\\d{1,2}\\.\\s*[a-zA-Z]*).*");
+	private static final String  BMK_WEB_ROOT           = "http://borgemusikken.no/";
+	private static final String  BMK_HTML_NEWS_HEADLINE = "class=\"ListTemp_Title\"";
+	static final         String  BMK_ENCODING           = "ISO-8859-1";
 
 	private static final String TAG = BmkNyhetListeHelper.class.getSimpleName();
 
 
-	public BmkNyhetListeHelper(NyhetService.NyhetListener listener) {
-		this.listener = listener;
-		responseHandler = new Handler(Looper.getMainLooper());
+	public BmkNyhetListeHelper(Context context, NyhetService.NyhetListener listener) {
+		mContext = context;
+		mListener = listener;
+		mNetworkUtils = NetworkUtils.getInstance(context);
+		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 
 	public void run() {
-		Log.i(TAG, "Henter nyheter fra BMK...");
-		doHentNyheter();
-		Log.i(TAG, "Nyheter hentet fra BMK");
+		if (mNetworkUtils.isNetworkAvailable()) {
+			doHentNyheter();
+		}
 
-		responseHandler.post(
+		mResponseHandler.post(
 			new Runnable() {
 				@Override
 				public void run() {
-					listener.onNyheterHentet(nyheter);
+					mListener.onNyheterHentet(mNyheter);
 				}
 			}
 		);
 	}
 
 	private void doHentNyheter() {
-		nyheter = new ArrayList<>();
+		Log.i(TAG, "Henter nyheter fra BMK...");
+		mNyheter = new ArrayList<>();
 
 		try {
 			String hovedsideHtml = new String(ServiceHelper.hentRaadata(BMK_WEB_ROOT + BMK_NEWS_PAGE), BMK_ENCODING);
@@ -103,7 +112,7 @@ public class BmkNyhetListeHelper implements Runnable {
 
 				Nyhet n = new Nyhet(overskrift, ingress, Nyhetskilde.BMK);
 				n.setDato(finnDato(overskrift));
-				nyheter.add(n);
+				mNyheter.add(n);
 
 				//Finner link til hoved-storyen
 				String lesMerLink = null;
@@ -117,9 +126,11 @@ public class BmkNyhetListeHelper implements Runnable {
 
 				overskriftStartIndex = hovedsideHtml.indexOf(BMK_HTML_NEWS_HEADLINE, ingressStartIndex + 1);
 			}
+			Log.i(TAG, "Nyheter hentet fra BMK");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			Toast.makeText(mContext, mContext.getString(R.string.bmk_nyheter_feil), Toast.LENGTH_LONG).show();
+			Log.e(TAG, "Klarte ikke å hente nyheter fra BMK", e);
 		}
 	}
 

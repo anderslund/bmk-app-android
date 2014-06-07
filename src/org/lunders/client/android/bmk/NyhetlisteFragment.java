@@ -21,12 +21,12 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
+import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
@@ -42,31 +42,32 @@ import java.util.*;
 
 public class NyhetlisteFragment extends ListFragment implements NyhetService.NyhetListener, NyhetService.NyhetDetaljListener {
 
-	private List<? extends NyhetService> nyhetServices;
+	//Nyhetene som vises "nå"
+	private Set<Nyhet> mCurrentNyheter;
 
-	private NyhetService bmkWebNyhetService, nmfNyhetService, twitterNyhetService;
+	//En liste over nyhetstjenestene
+	private List<? extends NyhetService> mNyhetServices;
 
-	private AlphaInAnimationAdapter alphaInAnimationAdapter;
-	private NyhetslisteAdapter      listAdapter;
+	//Selve nyhetstjenestene
+	private NyhetService mBmkWebNyhetService, mNmfNyhetService, mTwitterNyhetService;
 
-	private Set<Nyhet> currentNyheter;
+	//Adapter som holder på selve listedataene
+	private NyhetslisteAdapter mListAdapter;
 
+	//Hvor mange tegn som skal vises i "ingress"
 	public static final int PREVIEW_SIZE = 100;
 
-	private static final String TAG = NyhetlisteFragment.class.getSimpleName();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		currentNyheter = new TreeSet<>();
+		mCurrentNyheter = new TreeSet<>();
 
-		nyhetServices = Arrays.asList(
-			bmkWebNyhetService = new BMKWebNyhetServiceImpl(),
-			nmfNyhetService = new NmfNyhetServiceImpl(),
-			twitterNyhetService = new TwitterNyhetServiceImpl(getActivity()));
-
-		//setRetainInstance(true);
+		mNyhetServices = Arrays.asList(
+			mBmkWebNyhetService = new BMKWebNyhetServiceImpl(getActivity()),
+			mNmfNyhetService = new NmfNyhetServiceImpl(getActivity()),
+			mTwitterNyhetService = new TwitterNyhetServiceImpl(getActivity()));
 	}
 
 	@Override
@@ -75,15 +76,13 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 		getListView().setDivider(null);
 
 		if (savedInstanceState != null) {
-			currentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
-			onNyheterHentet(currentNyheter);
+			mCurrentNyheter = (Set<Nyhet>) savedInstanceState.getSerializable(getString(R.string.state_current_nyheter));
+			onNyheterHentet(mCurrentNyheter);
 		}
 
-		if (!currentNyheter.isEmpty()) {
-			Log.i(TAG, "Nyheter hentet fra saved instance state");
-		}
-		else {
-			for (NyhetService nyhetService : nyhetServices) {
+		//Hvis vi ikke fant nyheter i state, må vi hente på nytt
+		if (mCurrentNyheter == null || mCurrentNyheter.isEmpty()) {
+			for (NyhetService nyhetService : mNyhetServices) {
 				nyhetService.hentNyheter(this);
 			}
 		}
@@ -91,29 +90,29 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putSerializable(getString(R.string.state_current_nyheter), (Serializable) currentNyheter);
+		outState.putSerializable(getString(R.string.state_current_nyheter), (Serializable) mCurrentNyheter);
 	}
 
 	@Override
 	public void onNyheterHentet(Collection<Nyhet> nyheter) {
-		currentNyheter.addAll(nyheter);
+		mCurrentNyheter.addAll(nyheter);
 
-		if (listAdapter == null) {
-			listAdapter = new NyhetslisteAdapter(getActivity(), currentNyheter);
-			alphaInAnimationAdapter = new AlphaInAnimationAdapter(listAdapter);
-			alphaInAnimationAdapter.setAbsListView(getListView());
-			alphaInAnimationAdapter.setInitialDelayMillis(500);
-			setListAdapter(alphaInAnimationAdapter);
+		if (mListAdapter == null) {
+			mListAdapter = new NyhetslisteAdapter(getActivity(), mCurrentNyheter);
+			AnimationAdapter animationAdapter = new AlphaInAnimationAdapter(mListAdapter);
+			animationAdapter.setAbsListView(getListView());
+			animationAdapter.setInitialDelayMillis(500);
+			setListAdapter(animationAdapter);
 		}
 
-		listAdapter.clear();
-		listAdapter.addAll(currentNyheter);
+		mListAdapter.clear();
+		mListAdapter.addAll(mCurrentNyheter);
 	}
 
 
 	@Override
 	public void onNyhetHentet(Nyhet nyheten) {
-		View contentView = listAdapter.getContentView(nyheten.getListPosition());
+		View contentView = mListAdapter.getContentView(nyheten.getListPosition());
 		if (contentView != null) {
 			TextView tv = (TextView) contentView.findViewById(R.id.nyhetContent);
 
@@ -132,7 +131,9 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 	private class NyhetslisteAdapter extends ExpandableListItemAdapter<Nyhet> {
 
 		public NyhetslisteAdapter(Context context, Set<Nyhet> objects) {
-			super(context, R.layout.list_item_nyhet, R.id.nyhet_header_section, R.id.nyhet_content_section, new ArrayList(objects));
+			super(
+				context, R.layout.list_item_nyhet, R.id.nyhet_header_section, R.id.nyhet_content_section,
+				new ArrayList(objects));
 		}
 
 		@Override
@@ -176,15 +177,15 @@ public class NyhetlisteFragment extends ListFragment implements NyhetService.Nyh
 
 			switch (nyhet.getKilde()) {
 				case BMK:
-					bmkWebNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
+					mBmkWebNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
 					break;
 
 				case NMF:
-					nmfNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
+					mNmfNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
 					break;
 
 				case Twitter:
-					twitterNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
+					mTwitterNyhetService.hentNyhet(nyhet, NyhetlisteFragment.this);
 					break;
 			}
 			return convertView;

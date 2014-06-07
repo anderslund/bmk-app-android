@@ -20,26 +20,21 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
-import org.lunders.client.android.bmk.services.BildeService;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 
 public class BildeDetailFragment extends DialogFragment implements DownloadListener<ImageView> {
 
-	private Bilde bilde;
+	private Bilde                      mBilde;
+	private ImageDownloader<ImageView> mImageDownloader;
 
-	private ImageDownloader<ImageView> imageDownloader;
-	private Handler                    imageResponseHandler;
-	private BildeService               bildeService;
-
-	public static BildeDetailFragment newInstance(BildeService bildeService, Bilde b) {
-		BildeDetailFragment fragment = new BildeDetailFragment(bildeService, b);
+	public static BildeDetailFragment newInstance(Bilde b) {
+		BildeDetailFragment fragment = new BildeDetailFragment(b);
 		return fragment;
 	}
 
@@ -47,15 +42,14 @@ public class BildeDetailFragment extends DialogFragment implements DownloadListe
 
 	}
 
-	public BildeDetailFragment(BildeService bildeService, Bilde bilde) {
+	public BildeDetailFragment(Bilde bilde) {
 		this();
-		this.bilde = bilde;
-		this.bildeService = bildeService;
+		this.mBilde = bilde;
 
-		imageDownloader = new ImageDownloader(bildeService, imageResponseHandler = new Handler());
-		imageDownloader.setDownloadListener(this);
-		imageDownloader.start();
-		imageDownloader.getLooper();
+		mImageDownloader = new ImageDownloader();
+		mImageDownloader.setDownloadListener(this);
+		mImageDownloader.start();
+		mImageDownloader.getLooper();
 	}
 
 	public void onImageDownloaded(ImageView imageView, Bilde image) {
@@ -71,20 +65,19 @@ public class BildeDetailFragment extends DialogFragment implements DownloadListe
 		View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_bilde_detalj, null);
 
 		TextView tvFotograf = (TextView) v.findViewById(R.id.bilde_detalj_fotograf);
-		tvFotograf.setText(bilde.getFotograf());
+		tvFotograf.setText(mBilde.getFotograf());
 
 		TextView tvBeskrivelse = (TextView) v.findViewById(R.id.bilde_detalj_beskrivelse);
-		tvBeskrivelse.setText(bilde.getBeskrivelse());
+		tvBeskrivelse.setText(mBilde.getBeskrivelse());
 
 		TextView tvNumLikes = (TextView) v.findViewById(R.id.bilde_detalj_num_likes);
-		tvNumLikes.setText(String.valueOf(bilde.getNumLikes()));
+		tvNumLikes.setText(String.valueOf(mBilde.getNumLikes()));
 
 		ImageView ivBilde = (ImageView) v.findViewById(R.id.bilde_detalj_image);
-		imageDownloader.queueImage(ivBilde, bilde, ImageDownloader.ImageType.FULLSIZE);
+		mImageDownloader.queueImage(ivBilde, mBilde, ImageDownloader.ImageType.FULLSIZE);
 
 		Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(v)
-				//.setTitle(bilde.getOverskrift())
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 

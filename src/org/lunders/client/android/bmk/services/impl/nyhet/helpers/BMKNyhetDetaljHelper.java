@@ -16,79 +16,91 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.IOException;
 
 import static org.lunders.client.android.bmk.services.impl.nyhet.helpers.BmkNyhetListeHelper.BMK_ENCODING;
 
-//TODO: Mulig det kan gjøres noen triks med Html-klassen i stedet for lavnivå textparsing...
 public class BmkNyhetDetaljHelper implements Runnable {
 
-	private final Nyhet nyhet;
-	private final NyhetService.NyhetDetaljListener listener;
+	private final Nyhet                            mNyhet;
+	private final NyhetService.NyhetDetaljListener mListener;
+	private final Handler                          mResponseHandler;
+	private final NetworkUtils                     mNetworkUtils;
 
 	public static final String BMK_HTML_ARTICLE_HEADLINE = "class=\"ArtTemp_Title\"";
 
 	private static final String TAG = BmkNyhetDetaljHelper.class.getSimpleName();
-	private final Handler responseHandler;
 
-	public BmkNyhetDetaljHelper(Nyhet n, NyhetService.NyhetDetaljListener l) {
-		this.nyhet = n;
-		this.listener = l;
-		responseHandler = new Handler(Looper.getMainLooper());
+
+	public BmkNyhetDetaljHelper(Context c, Nyhet n, NyhetService.NyhetDetaljListener l) {
+		mNyhet = n;
+		mListener = l;
+		mNetworkUtils = NetworkUtils.getInstance(c);
+		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 	public void run() {
-		Log.i(TAG, "Henter full story fra BMK");
-		if ( nyhet.getFullStory() == null) {
+
+		if (mNyhet.getFullStory() == null) {
 			doHentNyhet();
-			Log.i(TAG, "Full story hentet fra BMK");
-		}
-		else {
-			Log.i(TAG, "Story allerede hentet");
 		}
 
-		//Sender melding til listener om at nyheten er hentet og klar for visning.
+		//Sender melding til mListener om at nyheten er hentet og klar for visning.
 		//En annen tråd (GUI-tråden) vil eksekvere denne koden.
-		responseHandler.post(
+		mResponseHandler.post(
 			new Runnable() {
 				@Override
 				public void run() {
-					listener.onNyhetHentet(nyhet);
+					mListener.onNyhetHentet(mNyhet);
 				}
 			}
 		);
 	}
 
 	private void doHentNyhet() {
+
+		if (!mNetworkUtils.isNetworkAvailable()) {
+			//TODO Bør vel gi et signal til brukeren om at vi ikke fikk hentet historien!
+			return;
+		}
+
+		Log.i(TAG, "Henter full story fra BMK");
+		String nyhetssideHtml;
 		try {
-			String nyhetssideHtml = new String(ServiceHelper.hentRaadata(nyhet.getFullStoryURL()), BMK_ENCODING);
-			int overskriftStartIndex = nyhetssideHtml.indexOf(BMK_HTML_ARTICLE_HEADLINE);
-
-			String story = null;
-			int storyStartIndex = nyhetssideHtml.indexOf("<tr>", overskriftStartIndex);
-			int tableEndIndex = nyhetssideHtml.indexOf("</table>", storyStartIndex);
-			while (tableEndIndex > storyStartIndex) {
-				storyStartIndex = nyhetssideHtml.indexOf(">", storyStartIndex + "<tr>".length()) + 1;
-				int storyEndIndex = nyhetssideHtml.indexOf("</td>", storyStartIndex);
-
-				String potensiellStory = nyhetssideHtml.substring(storyStartIndex, storyEndIndex);
-				if (!StringUtil.isBlank(potensiellStory) && !potensiellStory.trim().startsWith("<a href")) {
-					story = StringUtil.cleanHtml(potensiellStory);
-				}
-				storyStartIndex = nyhetssideHtml.indexOf("<tr>", storyEndIndex);
-			}
-			nyhet.setFullStory(story);
+			nyhetssideHtml = new String(ServiceHelper.hentRaadata(mNyhet.getFullStoryURL()), BMK_ENCODING);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			//Lager ikke toast her, for da ville det ha sprutet toasts når vi viser lista
+			Log.e(TAG, "Klarte ikke å hente nyhet fra BMK", e);
+			return;
 		}
+
+		int overskriftStartIndex = nyhetssideHtml.indexOf(BMK_HTML_ARTICLE_HEADLINE);
+
+		String story = null;
+		int storyStartIndex = nyhetssideHtml.indexOf("<tr>", overskriftStartIndex);
+		int tableEndIndex = nyhetssideHtml.indexOf("</table>", storyStartIndex);
+		while (tableEndIndex > storyStartIndex) {
+			storyStartIndex = nyhetssideHtml.indexOf(">", storyStartIndex + "<tr>".length()) + 1;
+			int storyEndIndex = nyhetssideHtml.indexOf("</td>", storyStartIndex);
+
+			String potensiellStory = nyhetssideHtml.substring(storyStartIndex, storyEndIndex);
+			if (!StringUtil.isBlank(potensiellStory) && !potensiellStory.trim().startsWith("<a href")) {
+				story = StringUtil.cleanHtml(potensiellStory);
+			}
+			storyStartIndex = nyhetssideHtml.indexOf("<tr>", storyEndIndex);
+		}
+		mNyhet.setFullStory(story);
+		Log.i(TAG, "Full story hentet fra BMK");
 	}
 }

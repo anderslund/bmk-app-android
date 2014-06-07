@@ -19,9 +19,7 @@ package org.lunders.client.android.bmk.services.impl.bilde;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.util.Log;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
-import org.lunders.client.android.bmk.services.BildeService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 
 import java.io.IOException;
@@ -31,36 +29,33 @@ import java.util.Map;
 
 public class ImageDownloader<Token> extends HandlerThread {
 
-	private BildeService bildeService;
+	private Handler                 mDownloadRequestHandler;
+	private Handler                 mDownloadResponseHandler;
+	private DownloadListener<Token> mResponseListener;
 
-	private Handler downloadRequestHandler, downloadResponseHandler;
-	private DownloadListener<Token> responseListener;
-
-	private Map<Token, Bilde> requestMap = Collections.synchronizedMap(new HashMap<Token, Bilde>());
-
-	private static final String TAG = ImageDownloader.class.getSimpleName();
-
-	private static final int MSG_TYPE_PICTURE_DOWNLOAD = 0;
+	private Map<Token, Bilde> mRequestMap = Collections.synchronizedMap(new HashMap<Token, Bilde>());
 
 	public static enum ImageType {THUMBNAIL, FULLSIZE}
 
-	public ImageDownloader(BildeService bildeService, Handler downloadResponseHandler) {
+	private static final int    MSG_TYPE_PICTURE_DOWNLOAD = 0;
+	private static final String TAG                       = ImageDownloader.class.getSimpleName();
+
+
+	public ImageDownloader() {
 		super(TAG);
-		this.bildeService = bildeService;
-		this.downloadResponseHandler = downloadResponseHandler;
+		this.mDownloadResponseHandler = new Handler();
 	}
 
 
 	public void queueImage(Token t, Bilde b, ImageType type) {
-		Log.i(TAG, "Queued an URL: " + b.getThumbnailUrl() + ". Token: " + t);
-		requestMap.put(t, b);
-		downloadRequestHandler.obtainMessage(MSG_TYPE_PICTURE_DOWNLOAD, type.ordinal(), -1, t).sendToTarget();
+		mRequestMap.put(t, b);
+		mDownloadRequestHandler.obtainMessage(MSG_TYPE_PICTURE_DOWNLOAD, type.ordinal(), -1, t).sendToTarget();
 	}
 
 
 	@Override
 	protected void onLooperPrepared() {
-		downloadRequestHandler = new Handler() {
+		mDownloadRequestHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				if (msg.what == MSG_TYPE_PICTURE_DOWNLOAD) {
@@ -73,7 +68,7 @@ public class ImageDownloader<Token> extends HandlerThread {
 	}
 
 	private void handleRequest(final Token token, final ImageType imageType) {
-		final Bilde b = requestMap.get(token);
+		final Bilde b = mRequestMap.get(token);
 		if (b == null) {
 			return;
 		}
@@ -88,23 +83,22 @@ public class ImageDownloader<Token> extends HandlerThread {
 			else {
 				b.setFullSizeBytes(bitmapBytes);
 			}
-			Log.i(TAG, "Image downloaded");
 
 			//Sier fra til lytteren (på en annen tråd) om at nå er thumbnailen ferdig nedlastet!
 			//Vi bruker post til å sende en melding til den andre køens "innboks".
-			downloadResponseHandler.post(
+			mDownloadResponseHandler.post(
 				new Runnable() {
 					@Override
 					public void run() {
-						if ( requestMap.get(token) == null) {
+						if (mRequestMap.get(token) == null) {
 							return;
 						}
-						if (imageType == ImageType.THUMBNAIL && requestMap.get(token).getThumbnailUrl() != url ||
-							imageType == ImageType.FULLSIZE && requestMap.get(token).getFullSizeUrl() != url) {
+						if (imageType == ImageType.THUMBNAIL && mRequestMap.get(token).getThumbnailUrl() != url ||
+							imageType == ImageType.FULLSIZE && mRequestMap.get(token).getFullSizeUrl() != url) {
 							return;
 						}
-						requestMap.remove(token);
-						responseListener.onImageDownloaded(token, b);
+						mRequestMap.remove(token);
+						mResponseListener.onImageDownloaded(token, b);
 					}
 				}
 			);
@@ -115,11 +109,11 @@ public class ImageDownloader<Token> extends HandlerThread {
 	}
 
 	public void clearQueue() {
-		downloadRequestHandler.removeMessages(MSG_TYPE_PICTURE_DOWNLOAD);
-		requestMap.clear();
+		mDownloadRequestHandler.removeMessages(MSG_TYPE_PICTURE_DOWNLOAD);
+		mRequestMap.clear();
 	}
 
 	public void setDownloadListener(DownloadListener<Token> responseListener) {
-		this.responseListener = responseListener;
+		this.mResponseListener = responseListener;
 	}
 }

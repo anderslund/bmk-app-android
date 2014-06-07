@@ -33,9 +33,10 @@ import org.lunders.client.android.bmk.util.DateUtil;
 
 public class AktivitetDetailFragment extends DialogFragment {
 
-	private AbstractAktivitet aktivitet;
+	private AbstractAktivitet mAktivitet;
 
 	public static final String EXTRA_AKTIVITET = "org.lunders.client.android.bmk.aktivitet_detalj";
+
 
 	public static AktivitetDetailFragment newInstance(AbstractAktivitet a) {
 		Bundle args = new Bundle();
@@ -50,12 +51,12 @@ public class AktivitetDetailFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 
 		View theView = getActivity().getLayoutInflater().inflate(R.layout.dialog_aktivitet_detalj, null);
-		aktivitet = (AbstractAktivitet) getArguments().getSerializable(EXTRA_AKTIVITET);
+		mAktivitet = (AbstractAktivitet) getArguments().getSerializable(EXTRA_AKTIVITET);
 
 		TextView aktivitetHeader = (TextView) theView.findViewById(R.id.aktivitetListHeader);
-		aktivitetHeader.setText(aktivitet.getAktivitetstype() + ": " + aktivitet.getNavn());
+		aktivitetHeader.setText(mAktivitet.getAktivitetstype() + ": " + mAktivitet.getNavn());
 
-		final Sted sted = aktivitet.getSted();
+		final Sted sted = mAktivitet.getSted();
 		TextView tvSted = (TextView) theView.findViewById(R.id.aktivitetListSted);
 		if (sted == null) {
 			tvSted.setText(getString(R.string.sted_ikke_avklart));
@@ -80,15 +81,15 @@ public class AktivitetDetailFragment extends DialogFragment {
 		tvSted.setVisibility(View.VISIBLE);
 
 		TextView aktivitetStart = (TextView) theView.findViewById(R.id.aktivitetListStartTime);
-		aktivitetStart.setText(DateUtil.getFormattedDateTime(aktivitet.getTidspunktStart()) + DateUtil.getFormattedEndTime(aktivitet.getTidspunktSlutt()));
+		aktivitetStart.setText(DateUtil.getFormattedDateTime(mAktivitet.getTidspunktStart()) + DateUtil.getFormattedEndTime(mAktivitet.getTidspunktSlutt()));
 
 		TextView aktivitetContent = (TextView) theView.findViewById(R.id.aktivitetListContent);
-		aktivitetContent.setText(aktivitet.getBeskrivelse());
+		aktivitetContent.setText(mAktivitet.getBeskrivelse());
 
 		ImageView aktivitetIcon = (ImageView) theView.findViewById(R.id.aktivitetListIcon);
 
 		int resourceId;
-		switch (aktivitet.getAktivitetstype()) {
+		switch (mAktivitet.getAktivitetstype()) {
 			case Øvelse:
 			case Ekstraøvelse:
 				resourceId = R.drawable.ovelse_icon;
@@ -103,7 +104,6 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 		Dialog d = new AlertDialog.Builder(getActivity())
 			.setView(theView)
-				//.setTitle(aktivitet.getOverskrift())
 			.setPositiveButton(android.R.string.ok, null)
 			.create();
 

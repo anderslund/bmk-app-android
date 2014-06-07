@@ -16,14 +16,18 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -35,40 +39,46 @@ import java.util.Collection;
 
 public class NmfNyhetListeHelper implements Runnable {
 
-	private Handler           responseHandler;
-	private NyhetService.NyhetListener listener;
-	private Collection<Nyhet> nyheter;
+	private Handler                    mResponseHandler;
+	private Context                    mContext;
+	private NyhetService.NyhetListener mListener;
+	private Collection<Nyhet>          mNyheter;
+	private NetworkUtils               mNetworkUtils;
 
-	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
 	public static final String NMF_ENCODING = "UTF-8";
+	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
 
 	private static final String TAG = NmfNyhetListeHelper.class.getSimpleName();
 
 
-	public NmfNyhetListeHelper(NyhetService.NyhetListener listener) {
-		this.listener = listener;
-		responseHandler = new Handler(Looper.getMainLooper());
+	public NmfNyhetListeHelper(Context context, NyhetService.NyhetListener listener) {
+		mContext = context;
+		mListener = listener;
+		mNetworkUtils = NetworkUtils.getInstance(context);
+		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 
 	@Override
 	public void run() {
-		Log.i(TAG, "Henter nyheter fra NMF...");
-		doHentNyheter();
-		Log.i(TAG, "Nyheter hentet fra NMF");
 
-		responseHandler.post(
+		if (mNetworkUtils.isNetworkAvailable()) {
+			doHentNyheter();
+		}
+
+		mResponseHandler.post(
 			new Runnable() {
 				@Override
 				public void run() {
-					listener.onNyheterHentet(nyheter);
+					mListener.onNyheterHentet(mNyheter);
 				}
 			}
 		);
 	}
 
 	private void doHentNyheter() {
-		nyheter = new ArrayList<>();
+		Log.i(TAG, "Henter Nyheter fra NMF...");
+		mNyheter = new ArrayList<>();
 
 		try {
 			String rssXML = new String(ServiceHelper.hentRaadata(NMF_WEB_ROOT), NMF_ENCODING);
@@ -80,12 +90,14 @@ public class NmfNyhetListeHelper implements Runnable {
 				String elementName = xmlPullParser.getName();
 				if ("item".equals(elementName) && xmlPullParser.getEventType() == XmlPullParser.START_TAG) {
 					Nyhet n = extractOneNyhet(xmlPullParser);
-					nyheter.add(n);
+					mNyheter.add(n);
 				}
 			}
+			Log.i(TAG, "Nyheter hentet fra NMF");
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Toast.makeText(mContext, mContext.getString(R.string.nmf_nyheter_feil), Toast.LENGTH_LONG).show();
+			Log.e(TAG, "Klarte ikke å hente nyheter fra NMF", e);
 		}
 	}
 

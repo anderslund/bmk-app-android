@@ -18,33 +18,29 @@ package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.services.NyhetService;
 
 public class TwitterNyhetDetaljHelper implements Runnable {
 
-	private final Nyhet nyhet;
-	private final NyhetService.NyhetDetaljListener listener;
-
-	private static final String TAG = TwitterNyhetDetaljHelper.class.getSimpleName();
-
-	private final Handler responseHandler;
+	private final Nyhet                            mNyhet;
+	private final NyhetService.NyhetDetaljListener mListener;
+	private final Handler                          mResponseHandler;
 
 	public TwitterNyhetDetaljHelper(Nyhet n, NyhetService.NyhetDetaljListener l) {
-		this.nyhet = n;
-		this.listener = l;
-		responseHandler = new Handler(Looper.getMainLooper());
+		this.mNyhet = n;
+		this.mListener = l;
+		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 	@Override
 	public void run() {
-		Log.i(TAG, "Trenger ikke å hente noe mer fra Twitter. \"Ingress\" og Story er samme sak.");
-		responseHandler.post(
+		// Trenger ikke å hente noe mer fra Twitter. "Ingress" og Story er samme sak
+		mResponseHandler.post(
 			new Runnable() {
 				@Override
 				public void run() {
-					listener.onNyhetHentet(nyhet);
+					mListener.onNyhetHentet(mNyhet);
 				}
 			}
 		);

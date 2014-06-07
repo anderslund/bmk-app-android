@@ -32,18 +32,19 @@ import java.util.Collection;
 public class TwitterNyhetServiceImpl implements NyhetService {
 
 	private Context mContext;
+
 	public static final String TWITTER_NYHET_CACHE = "twitterCache";
 
 	private static final String TAG = TwitterNyhetServiceImpl.class.getSimpleName();
 
-	public TwitterNyhetServiceImpl(Context context)  {
+	public TwitterNyhetServiceImpl(Context context) {
 		mContext = context;
 	}
 
 	@Override
 	public void hentNyheter(NyhetListener nyhetlisteListener) {
 
-		//Setter opp bakgrunnsjobben for å hente nyheter fra Twitter.
+		//Starter bakgrunnsjobben for å hente nyheter fra Twitter.
 		ThreadPool.getInstance().execute(new TwitterNyhetslisteHelper(mContext, nyhetlisteListener));
 
 		//Henter aktiviteter fra lokalt lager
@@ -60,10 +61,11 @@ public class TwitterNyhetServiceImpl implements NyhetService {
 		ThreadPool.getInstance().execute(new TwitterNyhetDetaljHelper(nyhet, listener));
 	}
 
+	//Laster nyhetene fra lokalt lager på enheten
 	private Collection<Nyhet> loadNyheterFromStorage() {
 		try {
 			final FileInputStream fis = mContext.openFileInput(TWITTER_NYHET_CACHE);
-			if ( fis == null) {
+			if (fis == null) {
 				return null;
 			}
 
@@ -72,7 +74,7 @@ public class TwitterNyhetServiceImpl implements NyhetService {
 			return nyheter;
 		}
 		catch (IOException | ClassNotFoundException e) {
-			Log.w(TAG, "Ingenting i twitter-cache: " + e.getMessage());
+			Log.i(TAG, "Ingenting i twitter-cache: " + e.getMessage());
 		}
 		return null;
 	}

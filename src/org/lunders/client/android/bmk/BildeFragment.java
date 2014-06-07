@@ -19,10 +19,8 @@ package org.lunders.client.android.bmk;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,23 +41,19 @@ public class BildeFragment extends Fragment {
 
 	private InstagramBildeServiceHelper instagramBildeService;
 	private List<Bilde> currentBilder;
-	private GridView gridView;
+	private GridView    gridView;
 
 	private ImageDownloader<ImageView> imageDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 
 	public BildeFragment() {
-		Log.i(TAG, "constructor");
 		instagramBildeService = new InstagramBildeServiceHelper();
-
 		setupImageDownloader();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
-
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
@@ -67,29 +61,24 @@ public class BildeFragment extends Fragment {
 			currentBilder = (List<Bilde>) savedInstanceState.getSerializable(getString(R.string.state_current_bilder));
 		}
 
-		if (currentBilder != null) {
-			Log.i(TAG, "Bilder hentet fra saved instance state");
-		}
-
-		//Denne har ansvar for å hente URLer (typisk via en slags spørring) til bilder vi senere skal laste
-		//thumbnails for
-		else {
+		// Hvis vi ikke fant bilder i state, må vi laste på nytt
+		if (currentBilder == null || currentBilder.isEmpty()) {
 			new GetAvailblePicturesTask().execute();
 		}
 	}
+
 
 	private void setupImageDownloader() {
 		//Setter i gang en tråd som laster ned thumbnails i bakgrunnen.
 		//Den har en meldingskø som looperen plukker ut URLer fra.
 		//Disse URLene settes fra getView på BildeAdapter, altså først når viewet trenger å vise en thumbnail.
 		//Handleren her assosieres med den tråden som oppretter den (dvs UI-tråden)
-		imageDownloader = new ImageDownloader<>(instagramBildeService, new Handler());
+		imageDownloader = new ImageDownloader<>();
 		imageDownloader.setDownloadListener(
 			new DownloadListener<ImageView>() {
 				@Override
 				public void onImageDownloaded(ImageView imageView, Bilde thumbnail) {
 					if (isVisible()) {
-						//imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 						byte[] thumbnailBytes = thumbnail.getThumbnailBytes();
 						imageView.setImageBitmap(BitmapFactory.decodeByteArray(thumbnailBytes, 0, thumbnailBytes.length));
 					}
@@ -128,7 +117,6 @@ public class BildeFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.i(TAG, "onSaveInstanceState");
 		outState.putSerializable(getString(R.string.state_current_bilder), (Serializable) currentBilder);
 	}
 
@@ -168,7 +156,6 @@ public class BildeFragment extends Fragment {
 			}
 			else {
 				imageView.setImageResource(R.drawable.trumpet_icon);
-				//imageView.setBackgroundResource(R.drawable.shape_image_dropshadow);
 
 				if (imageDownloader != null) {
 					imageDownloader.queueImage(imageView, b, ImageDownloader.ImageType.THUMBNAIL);
@@ -180,9 +167,8 @@ public class BildeFragment extends Fragment {
 					@Override
 					public void onClick(View v) {
 						//Åpne en dialog med full-size bilde, antall likes, hvem bildet er tatt av og hvilken tekst
-						Log.i(TAG, "Bilde tatt av " + b.getFotograf() + "'" + b.getBeskrivelse() + "'");
 						FragmentManager fm = getActivity().getSupportFragmentManager();
-						BildeDetailFragment dialog = BildeDetailFragment.newInstance(instagramBildeService, b);
+						BildeDetailFragment dialog = BildeDetailFragment.newInstance(b);
 						dialog.show(fm, "bilde_detalj");
 					}
 				}

@@ -46,14 +46,8 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 	private static final String TAG = AktivitetlisteFragment.class.getSimpleName();
 
 
-	public AktivitetlisteFragment() {
-		Log.i(TAG, "constructor");
-	}
-
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.i(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		mCurrentAktiviteter = new ArrayList<>();
 		mAktivitetService = new AktivitetServiceImpl(getActivity());
@@ -71,14 +65,10 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 			onAktiviteterHentet(mCurrentAktiviteter);
 		}
 
-		if (!mCurrentAktiviteter.isEmpty()) {
-			Log.i(TAG, "Aktiviteter hentet fra saved instance state");
-		}
-		else {
+		if (mCurrentAktiviteter.isEmpty()) {
 			mAktivitetService.hentAktiviteter(this);
 		}
 	}
-
 
 
 	@Override
@@ -90,7 +80,11 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 
 	@Override
 	public void onAktiviteterHentet(Collection<AbstractAktivitet> aktiviteter) {
-		Log.i(TAG, "onAktiviteterHentet");
+
+		if (aktiviteter == null) {
+			return;
+		}
+
 		mCurrentAktiviteter.clear();
 		mCurrentAktiviteter.addAll(aktiviteter);
 
@@ -109,7 +103,6 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		AbstractAktivitet valgtAktivitet = (AbstractAktivitet) getListAdapter().getItem(position);
-		Log.i(TAG, "Klikket på " + valgtAktivitet.getNavn());
 
 		FragmentManager fm = getActivity().getSupportFragmentManager();
 		AktivitetDetailFragment dialog = AktivitetDetailFragment.newInstance(valgtAktivitet);

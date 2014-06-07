@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet;
 
+import android.content.Context;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.nyhet.helpers.NmfNyhetDetaljHelper;
@@ -24,13 +25,19 @@ import org.lunders.client.android.bmk.util.ThreadPool;
 
 public class NmfNyhetServiceImpl implements NyhetService {
 
+	private final Context mContext;
+
+	public NmfNyhetServiceImpl(Context context) {
+		mContext = context;
+	}
+
 	@Override
 	public void hentNyheter(NyhetListener listener) {
-		ThreadPool.getInstance().execute(new NmfNyhetListeHelper(listener));
+		ThreadPool.getInstance().execute(new NmfNyhetListeHelper(mContext, listener));
 	}
 
 	@Override
 	public void hentNyhet(Nyhet nyhet, NyhetDetaljListener listener) {
-		ThreadPool.getInstance().execute(new NmfNyhetDetaljHelper(nyhet, listener));
+		ThreadPool.getInstance().execute(new NmfNyhetDetaljHelper(mContext, nyhet, listener));
 	}
 }
