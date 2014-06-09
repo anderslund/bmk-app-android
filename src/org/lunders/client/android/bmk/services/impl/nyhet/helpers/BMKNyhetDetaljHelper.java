@@ -28,7 +28,7 @@ import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.IOException;
 
-import static org.lunders.client.android.bmk.services.impl.nyhet.helpers.BmkNyhetListeHelper.BMK_ENCODING;
+import static org.lunders.client.android.bmk.services.impl.nyhet.helpers.BMKNyhetListeHelper.BMK_ENCODING;
 
 public class BmkNyhetDetaljHelper implements Runnable {
 

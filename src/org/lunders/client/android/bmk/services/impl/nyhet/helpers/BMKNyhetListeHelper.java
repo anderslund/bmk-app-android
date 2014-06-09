@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BmkNyhetListeHelper implements Runnable {
+public class BMKNyhetListeHelper implements Runnable {
 
 	private Handler                    mResponseHandler;
 	private NyhetService.NyhetListener mListener;
@@ -55,10 +55,10 @@ public class BmkNyhetListeHelper implements Runnable {
 	private static final String  BMK_HTML_NEWS_HEADLINE = "class=\"ListTemp_Title\"";
 	static final         String  BMK_ENCODING           = "ISO-8859-1";
 
-	private static final String TAG = BmkNyhetListeHelper.class.getSimpleName();
+	private static final String TAG = BMKNyhetListeHelper.class.getSimpleName();
 
 
-	public BmkNyhetListeHelper(Context context, NyhetService.NyhetListener listener) {
+	public BMKNyhetListeHelper(Context context, NyhetService.NyhetListener listener) {
 		mContext = context;
 		mListener = listener;
 		mNetworkUtils = NetworkUtils.getInstance(context);

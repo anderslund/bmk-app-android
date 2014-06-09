@@ -19,8 +19,8 @@ package org.lunders.client.android.bmk.services.impl.nyhet;
 import android.content.Context;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.services.NyhetService;
+import org.lunders.client.android.bmk.services.impl.nyhet.helpers.BMKNyhetListeHelper;
 import org.lunders.client.android.bmk.services.impl.nyhet.helpers.BmkNyhetDetaljHelper;
-import org.lunders.client.android.bmk.services.impl.nyhet.helpers.BmkNyhetListeHelper;
 import org.lunders.client.android.bmk.util.ThreadPool;
 
 public class BMKWebNyhetServiceImpl implements NyhetService {
@@ -33,7 +33,7 @@ public class BMKWebNyhetServiceImpl implements NyhetService {
 
 	@Override
 	public void hentNyheter(NyhetListener nyhetListener) {
-		ThreadPool.getInstance().execute(new BmkNyhetListeHelper(mContext, nyhetListener));
+		ThreadPool.getInstance().execute(new BMKNyhetListeHelper(mContext, nyhetListener));
 	}
 
 	@Override

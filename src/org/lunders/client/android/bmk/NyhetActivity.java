@@ -111,10 +111,6 @@ public class NyhetActivity extends FragmentActivity {
 				Toast.makeText(this, item.getTitle(), Toast.LENGTH_LONG).show();
 				return true;
 
-			case R.id.action_settings:
-				Toast.makeText(this, item.getTitle(), Toast.LENGTH_LONG).show();
-				return true;
-
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -126,7 +122,7 @@ public class NyhetActivity extends FragmentActivity {
 		mDrawerList.setAdapter(
 			new ArrayAdapter<>(
 				this, R.layout.drawer_list_item,
-				new String[]{"Nyheter og sosiale media", "Min profil", "Option 3"}));
+				new String[]{"Nyheter og sosiale media", "Min profil", "Innstillinger"}));
 
 		mDrawerList.setSelection(0);
 
