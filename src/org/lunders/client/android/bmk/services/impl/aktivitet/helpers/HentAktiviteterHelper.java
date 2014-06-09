@@ -33,7 +33,7 @@ import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
-import org.lunders.client.android.bmk.util.UiUtil;
+import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileOutputStream;
@@ -61,8 +61,8 @@ public class HentAktiviteterHelper implements Runnable {
 
 	public HentAktiviteterHelper(Context context, AktivitetService.AktivitetListener listener) {
 		mContext = context;
-		mResponseHandler = new Handler(Looper.getMainLooper());
 		mListener = listener;
+		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 	@Override
@@ -73,6 +73,7 @@ public class HentAktiviteterHelper implements Runnable {
 		if (mCurrentAktiviteter != null) {
 			storeAktiviteterToStorage(mCurrentAktiviteter);
 		}
+
 		mResponseHandler.post(
 			new Runnable() {
 				@Override
@@ -86,17 +87,17 @@ public class HentAktiviteterHelper implements Runnable {
 
 	private void doHentAktiviteter() {
 
-		String aktiviteterYaml;
+		List<Map<String, Object>> aktiviteter;
 		try {
-			aktiviteterYaml = new String(ServiceHelper.hentRaadata(GITHUB_AKTIVITETER), AKTIVITETER_ENCODING);
+			String aktiviteterYaml = new String(ServiceHelper.hentRaadata(GITHUB_AKTIVITETER), AKTIVITETER_ENCODING);
+			Yaml y = new Yaml();
+			aktiviteter = (List<Map<String, Object>>) y.load(aktiviteterYaml);
 		}
-		catch (IOException e) {
-			UiUtil.showToast((Activity) mContext, R.string.aktivitet_feil, Toast.LENGTH_LONG);
+		catch (Exception e) {
+			Log.e(TAG, mContext.getString(R.string.aktivitet_feil), e);
+			DisplayUtil.showToast((Activity) mContext, R.string.aktivitet_feil, Toast.LENGTH_LONG);
 			return;
 		}
-
-		Yaml y = new Yaml();
-		List<Map<String, Object>> aktiviteter = (List<Map<String, Object>>) y.load(aktiviteterYaml);
 
 		mCurrentAktiviteter = new ArrayList<>(aktiviteter.size());
 		for (Map<String, Object> rawAktivitet : aktiviteter) {
@@ -131,10 +132,11 @@ public class HentAktiviteterHelper implements Runnable {
 			}
 
 			aktivitet.setBeskrivelse(beskrivelse);
-			aktivitet.setTidspunktStart(DateUtil.getDate(tidspunktSlutt));
+			aktivitet.setTidspunktSlutt(DateUtil.getDate(tidspunktSlutt));
 			aktivitet.setSted(getSted(rawSted));
 			mCurrentAktiviteter.add(aktivitet);
 		}
+		Log.i(TAG, "Har hentet aktiviteter fra GitHub.");
 	}
 
 	private Sted getSted(Map<String, Object> rawSted) {

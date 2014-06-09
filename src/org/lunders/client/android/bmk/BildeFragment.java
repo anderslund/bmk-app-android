@@ -19,7 +19,6 @@ package org.lunders.client.android.bmk;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -34,7 +33,8 @@ import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
 import org.lunders.client.android.bmk.services.impl.bilde.InstagramBildeServiceHelper;
-import org.lunders.client.android.bmk.util.UiUtil;
+import org.lunders.client.android.bmk.util.DisplayUtil;
+import org.lunders.client.android.bmk.util.ThreadPool;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -50,15 +50,19 @@ public class BildeFragment extends Fragment {
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 
+	public BildeFragment() {
+	}
+
 	public BildeFragment(Context context) {
 		mContext = context;
 		mInstagramBildeService = new InstagramBildeServiceHelper();
-		setupImageDownloader();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setupImageDownloader();
+
 		setRetainInstance(true);
 
 		if (savedInstanceState != null) {
@@ -67,7 +71,7 @@ public class BildeFragment extends Fragment {
 
 		// Hvis vi ikke fant bilder i state, må vi laste på nytt
 		if (mCurrentBilder == null || mCurrentBilder.isEmpty()) {
-			new GetAvailblePicturesTask().execute();
+			ThreadPool.getInstance().execute(new GetAvailblePicturesTask());
 		}
 	}
 
@@ -98,7 +102,9 @@ public class BildeFragment extends Fragment {
 		super.onDestroy();
 
 		//Stopper tråden. Dette er viktig, ellers vil Android fortsette å kjøre den i bakgrunnen til enheten restartes.
-		mImageDownloader.quit();
+		if (mImageDownloader != null) {
+			mImageDownloader.quit();
+		}
 	}
 
 	@Override
@@ -115,7 +121,9 @@ public class BildeFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		mImageDownloader.clearQueue();
+		if (mImageDownloader != null) {
+			mImageDownloader.clearQueue();
+		}
 	}
 
 	@Override
@@ -185,24 +193,23 @@ public class BildeFragment extends Fragment {
 	/**
 	 * Ansvarlig for å kontakte bildetjenesten(e) for å hente ut liste(r) over bilder/thumbnails som skal lastes ned.
 	 */
-	private class GetAvailblePicturesTask extends AsyncTask<Void, Void, List<Bilde>> {
+	private class GetAvailblePicturesTask implements Runnable {
 
 		@Override
-		protected List<Bilde> doInBackground(Void... params) {
-
+		public void run() {
 			try {
-				return mInstagramBildeService.hentBilder();
+				mCurrentBilder = mInstagramBildeService.hentBilder();
+				getActivity().runOnUiThread(
+					new Runnable() {
+						@Override
+						public void run() {
+							setupAdapter();
+						}
+					});
 			}
 			catch (final IOException e) {
-				UiUtil.showToast((Activity) mContext, R.string.instagram_feil, Toast.LENGTH_LONG);
-				return null;
+				DisplayUtil.showToast((Activity) mContext, R.string.instagram_feil, Toast.LENGTH_LONG);
 			}
-		}
-
-		@Override
-		protected void onPostExecute(List<Bilde> abilder) {
-			mCurrentBilder = abilder;
-			setupAdapter();
 		}
 	}
 }

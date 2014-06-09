@@ -23,13 +23,17 @@ import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
@@ -42,7 +46,7 @@ public class NyhetActivity extends FragmentActivity {
 	private ViewPager mViewPager;
 
 	// For navigasjonsmeny (fra venstre)
-	//private ActionBarDrawerToggle mDrawerToggle;
+	private ActionBarDrawerToggle mDrawerToggle;
 
 	//Antall tabs i pageren
 	public static final int NUM_FRAGMENTS = 3;
@@ -55,7 +59,7 @@ public class NyhetActivity extends FragmentActivity {
 		setContentView(R.layout.activity_nyheter);
 		setupViewPagerForSwiping();
 		setupActionBar();
-		//setupNavigationDrawer();
+		setupNavigationDrawer();
 	}
 
 	/** Setter opp action bar (tool bar) */
@@ -90,46 +94,77 @@ public class NyhetActivity extends FragmentActivity {
 		getActionBar().addTab(getActionBar().newTab().setText("Bilder").setTabListener(tabListener));
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.nyhet_activity_actions, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+			case R.id.action_login:
+				Toast.makeText(this, item.getTitle(), Toast.LENGTH_LONG).show();
+				return true;
+
+			case R.id.action_settings:
+				Toast.makeText(this, item.getTitle(), Toast.LENGTH_LONG).show();
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
 	private void setupNavigationDrawer() {
 		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		//ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		//mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, new String[]{"Option 1", "Option2", "Option 3"}));
+		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		mDrawerList.setAdapter(
+			new ArrayAdapter<>(
+				this, R.layout.drawer_list_item,
+				new String[]{"Nyheter og sosiale media", "Min profil", "Option 3"}));
 
-//		mDrawerToggle = new ActionBarDrawerToggle(
-//			this,                  /* host Activity */
-//			mDrawerLayout,         /* DrawerLayout object */
-//			R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
-//			R.string.drawer_open,  /* "open drawer" description */
-//			R.string.drawer_close  /* "close drawer" description */
-//		) {
-//
-//			/** Called when a drawer has settled in a completely closed state. */
-//			public void onDrawerClosed(View view) {
-//				super.onDrawerClosed(view);
-//				//getActionBar().setTitle(mTitle);
-//			}
-//
-//			/** Called when a drawer has settled in a completely open state. */
-//			public void onDrawerOpened(View drawerView) {
-//				super.onDrawerOpened(drawerView);
-//				//getActionBar().setTitle(mDrawerTitle);
-//			}
-//		};
+		mDrawerList.setSelection(0);
+
+		mDrawerToggle = new ActionBarDrawerToggle(
+			this,                  /* host Activity */
+			mDrawerLayout,         /* DrawerLayout object */
+			R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+			R.string.drawer_open,  /* "open drawer" description */
+			R.string.drawer_close  /* "close drawer" description */
+		) {
+
+			/** Called when a drawer has settled in a completely closed state. */
+			public void onDrawerClosed(View view) {
+				super.onDrawerClosed(view);
+				//getActionBar().setTitle(mTitle);
+			}
+
+			/** Called when a drawer has settled in a completely open state. */
+			public void onDrawerOpened(View drawerView) {
+				super.onDrawerOpened(drawerView);
+				//getActionBar().setTitle(mDrawerTitle);
+			}
+		};
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		//getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 
 		// Set the drawer toggle as the DrawerListener
-		//mDrawerLayout.setDrawerListener(mDrawerToggle);
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
-//		if (mDrawerToggle != null) {
-//			mDrawerToggle.syncState();
-//		}
+		if (mDrawerToggle != null) {
+			mDrawerToggle.syncState();
+		}
 	}
 
 	/** Setter opp en pager for å støtte swiping mellom tabs */

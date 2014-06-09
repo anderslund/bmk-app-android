@@ -32,8 +32,8 @@ import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImpl;
+import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
-import org.lunders.client.android.bmk.util.UiUtil;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 	private Collection<Nyhet>          nyheter;
 	private NetworkUtils               mNetworkUtils;
 
-	public static final String TWITTER_ENCODING = "UTF-8";
+	public static final  String TWITTER_ENCODING   = "UTF-8";
 	private static final String TWITTER_SEARCH_URL =
 		"https://twitter.com/search?q=%23allesnakkerkorps+OR+from%3Aborgemusikken&count=20";
 
@@ -93,7 +93,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			searchResultHtml = new String(ServiceHelper.hentRaadata(TWITTER_SEARCH_URL), TWITTER_ENCODING);
 		}
 		catch (IOException e) {
-			UiUtil.showToast((Activity) mContext, R.string.twitter_nyheter_feil, Toast.LENGTH_LONG);
+			DisplayUtil.showToast((Activity) mContext, R.string.twitter_nyheter_feil, Toast.LENGTH_LONG);
 			Log.e(TAG, "Klarte ikke å hente nyheter fra Twitter", e);
 			return null;
 		}

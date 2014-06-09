@@ -27,7 +27,7 @@ public class DateUtil {
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static final SimpleDateFormat formattedDateFormat = new SimpleDateFormat("dd. MMM yyyy");
+	private static final SimpleDateFormat formattedDateFormat = new SimpleDateFormat("d. MMM yyyy");
 
 	private static final SimpleDateFormat nmfFormattedDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss Z", Locale.ENGLISH);
 

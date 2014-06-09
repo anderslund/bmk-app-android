@@ -28,4 +28,6 @@
   <string name="nmf_nyheter_feil">Klarte ikke å hente nyheter fra NMF</string>
   <string name="bmk_nyheter_feil">Klarte ikke å hente nyheter fra BMK</string>
   <string name="instagram_feil">Klarte ikke å hente bilder fra Instagram</string>
+  <string name="menu_action_login">Logg inn</string>
+  <string name="menu_action_settings">Innstillinger</string>
 </resources>

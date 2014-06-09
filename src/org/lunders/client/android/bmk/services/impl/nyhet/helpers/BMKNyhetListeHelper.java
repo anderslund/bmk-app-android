@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +27,7 @@ import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
 
@@ -129,8 +131,8 @@ public class BmkNyhetListeHelper implements Runnable {
 			Log.i(TAG, "Nyheter hentet fra BMK");
 		}
 		catch (IOException e) {
-			Toast.makeText(mContext, mContext.getString(R.string.bmk_nyheter_feil), Toast.LENGTH_LONG).show();
-			Log.e(TAG, "Klarte ikke å hente nyheter fra BMK", e);
+			DisplayUtil.showToast((Activity) mContext, R.string.bmk_nyheter_feil, Toast.LENGTH_LONG);
+			Log.e(TAG, mContext.getString(R.string.bmk_nyheter_feil), e);
 		}
 	}
 

@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.services.impl.nyhet.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,6 +28,7 @@ import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -96,8 +98,8 @@ public class NmfNyhetListeHelper implements Runnable {
 			Log.i(TAG, "Nyheter hentet fra NMF");
 		}
 		catch (Exception e) {
-			Toast.makeText(mContext, mContext.getString(R.string.nmf_nyheter_feil), Toast.LENGTH_LONG).show();
-			Log.e(TAG, "Klarte ikke å hente nyheter fra NMF", e);
+			DisplayUtil.showToast((Activity) mContext, R.string.nmf_nyheter_feil, Toast.LENGTH_LONG);
+			Log.e(TAG, mContext.getString(R.string.nmf_nyheter_feil), e);
 		}
 	}
 

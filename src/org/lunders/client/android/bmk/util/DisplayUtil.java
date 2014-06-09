@@ -19,9 +19,9 @@ package org.lunders.client.android.bmk.util;
 import android.app.Activity;
 import android.widget.Toast;
 
-public final class UiUtil {
+public final class DisplayUtil {
 
-	private UiUtil() {
+	private DisplayUtil() {
 	}
 
 	public static void showToast(final Activity activity, final int resourceId, final int duration) {
