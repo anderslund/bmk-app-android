@@ -28,9 +28,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
+import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
 import org.lunders.client.android.bmk.services.AktivitetService;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.SessionUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
@@ -85,8 +87,14 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 			return;
 		}
 
+		//Viser ikke oppdragsaktiviteter dersom vi ikke er logget inn
 		mCurrentAktiviteter.clear();
-		mCurrentAktiviteter.addAll(aktiviteter);
+		for (AbstractAktivitet aktivitet : aktiviteter) {
+			if (aktivitet instanceof Oppdrag && !SessionUtils.isLoggedIn()) {
+				continue;
+			}
+			mCurrentAktiviteter.add(aktivitet);
+		}
 
 		if (mListAdapter == null) {
 			Context c = getActivity();

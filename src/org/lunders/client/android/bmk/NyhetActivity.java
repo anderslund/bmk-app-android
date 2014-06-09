@@ -33,7 +33,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 import org.lunders.client.android.bmk.util.DateUtil;
 
 /**
@@ -108,7 +107,9 @@ public class NyhetActivity extends FragmentActivity {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 			case R.id.action_login:
-				Toast.makeText(this, item.getTitle(), Toast.LENGTH_LONG).show();
+				FragmentManager fm = getSupportFragmentManager();
+				LoginFragment dialog = LoginFragment.newInstance();
+				dialog.show(fm, "dialog_login");
 				return true;
 
 			default:

@@ -30,4 +30,8 @@
   <string name="instagram_feil">Klarte ikke å hente bilder fra Instagram</string>
   <string name="menu_action_login">Logg inn</string>
   <string name="menu_action_settings">Innstillinger</string>
+  <string name="username">Brukernavn</string>
+  <string name="password">Passord</string>
+  <string name="signin">Logg på</string>
+  <string name="cancel">Avbryt</string>
 </resources>
