@@ -22,7 +22,8 @@ import java.security.MessageDigest;
 
 public class SessionUtils {
 
-	private static String  loggedInUserId;
+	private static String loggedInUserId;
+	private static String loggedInUserDisplayName = "Anders Lund";
 	private static boolean localSessionRead;
 
 	public enum LoginStatus {OK, BAD_CREDENTIALS, MISSING_USERNAME, MISSING_PASSWORD, COMM_FAILURE}
@@ -59,6 +60,7 @@ public class SessionUtils {
 		return LoginStatus.OK;
 	}
 
+
 	public static LoginStatus doSetPassword(CharSequence username, CharSequence existingPassword, CharSequence newPassword) {
 		LoginStatus status = doLogin(username, existingPassword);
 
@@ -71,6 +73,7 @@ public class SessionUtils {
 		return LoginStatus.OK;
 
 	}
+
 
 	public static boolean isLoggedIn() {
 		if (loggedInUserId != null) {
@@ -99,7 +102,13 @@ public class SessionUtils {
 		SessionUtils.loggedInUserId = loggedInUserId;
 	}
 
+	public static String getLoggedInUserDisplayName() {
+		return loggedInUserDisplayName;
+	}
 
+	public static void setLoggedInUserDisplayName(String loggedInUserDisplayName) {
+		SessionUtils.loggedInUserDisplayName = loggedInUserDisplayName;
+	}
 
 	public static String hashEncode(String stringToEncode) {
 

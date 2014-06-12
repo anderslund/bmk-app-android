@@ -26,7 +26,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.*;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 import org.lunders.client.android.bmk.fragments.felles.LoginFragment;
 import org.lunders.client.android.bmk.util.BmkPagerAdapter;
 import org.lunders.client.android.bmk.util.DateUtil;
@@ -57,6 +60,7 @@ public class MainActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (SessionUtils.isLoggedIn()) {
+			//TODO: Litt kult bakgrunnsbilde. Ser for meg BMK-logoen med speilbilde som et fjell bak en sjø :-)
 			setTheme(R.style.Theme_bmk_logged_in);
 		}
 
@@ -69,6 +73,9 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		mFragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer);
+		if (SessionUtils.isLoggedIn()) {
+			mFragmentContainer.setBackgroundResource(R.drawable.background_gradient);
+		}
 		setupViewPager();
 		setupActionBar();
 		setupNavigationDrawer();
@@ -80,6 +87,9 @@ public class MainActivity extends FragmentActivity {
 
 		//Setter dagens dato som subtittel
 		mActionBar = getActionBar();
+		if (SessionUtils.isLoggedIn()) {
+			mActionBar.setTitle(SessionUtils.getLoggedInUserDisplayName());
+		}
 
 		mActionBar.setSubtitle(DateUtil.getFormattedCurrentDate());
 //
@@ -112,13 +122,18 @@ public class MainActivity extends FragmentActivity {
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.nyhet_activity_actions, menu);
+
+		if (SessionUtils.isLoggedIn()) {
+			menu.findItem(R.id.action_login).setIcon(R.drawable.ic_action_secure);
+			menu.findItem(R.id.action_login).setTitle(R.string.menu_action_logout);
+		}
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 			case R.id.action_login:
 				LoginFragment dialog = LoginFragment.newInstance();
@@ -131,6 +146,8 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
+	//TODO: Nav drawer skal bare være synlig dersom man har logget inn!
+	//TODO: Og når man logger inn, hadde det vært kult om draweren liksom fadet inn åpen og så lukket seg etter 500ms
 	private void setupNavigationDrawer() {
 		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -140,11 +157,11 @@ public class MainActivity extends FragmentActivity {
 				new String[]{"Nyheter og sosiale media", "Min profil", "Innstillinger"}));
 
 		mDrawerList.setSelection(0);
+
 		mDrawerList.setOnItemClickListener(
 			new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					System.out.println("Trykket på " + ((TextView) view).getText());
 					final FragmentManager fm = getSupportFragmentManager();
 
 					switch (position) {
@@ -206,6 +223,7 @@ public class MainActivity extends FragmentActivity {
 			mDrawerToggle.syncState();
 		}
 	}
+
 
 	/** Setter opp en pager for å støtte swiping mellom tabs */
 	private void setupViewPager() {

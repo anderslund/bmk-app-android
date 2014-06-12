@@ -21,10 +21,14 @@
 	</style>
 
 	<style name="Theme_bmk_logged_in" parent="Theme_bmk_logged_out">
-		<item name="android:windowBackground">@drawable/bmk_logo_transparent_2</item>
+		<item name="android:listViewStyle">@style/Widget.Bmk.ListView</item>
 	</style>
 
 	<style name="Widget.Bmk.ActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid">
 		<item name="android:background">@drawable/notes_2_trans</item>
+	</style>
+
+	<style name="Widget.Bmk.ListView" parent="android:Widget.Holo.Light.ListView">
+		<!--<item name="android:background">@drawable/background_gradient</item>-->
 	</style>
 </resources>

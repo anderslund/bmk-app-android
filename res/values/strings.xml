@@ -29,7 +29,7 @@
 	<string name="bmk_nyheter_feil">Klarte ikke å hente nyheter fra BMK</string>
 	<string name="instagram_feil">Klarte ikke å hente bilder fra Instagram</string>
 	<string name="menu_action_login">Logg inn</string>
-	<string name="menu_action_settings">Innstillinger</string>
+	<string name="menu_action_logout">Logg ut</string>
 	<string name="username">Brukernavn</string>
 	<string name="password">Passord</string>
 	<string name="signin">Logg på</string>
@@ -41,4 +41,5 @@
 	<string name="login_passord_mangler">Passord må oppgis</string>
 	<string name="login_brukernavn_mangler">Brukernavn må oppgis</string>
 	<string name="login_ok">Du er nå logget inn</string>
+
 </resources>
