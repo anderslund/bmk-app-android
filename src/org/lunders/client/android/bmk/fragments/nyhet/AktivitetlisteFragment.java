@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
 import org.lunders.client.android.bmk.services.AktivitetService;

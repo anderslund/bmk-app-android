@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;

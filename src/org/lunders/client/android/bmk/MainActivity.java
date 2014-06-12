@@ -17,29 +17,28 @@
 package org.lunders.client.android.bmk;
 
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.*;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ListView;
+import android.view.*;
+import android.widget.*;
+import org.lunders.client.android.bmk.fragments.felles.LoginFragment;
+import org.lunders.client.android.bmk.util.BmkPagerAdapter;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.SessionUtils;
+
+import java.util.List;
 
 /**
  * Hovedaktiviteten (den man "lander på") for appen. I denne activityen kan man se på kommende BMK-
  * aktiviteter (konserter etc), nyheter fra diverse kilder og bilder fra instagram.
  */
-public class NyhetActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
 
 	//For å støtte swiping mellom tabs
 	private ViewPager mViewPager;
@@ -47,32 +46,44 @@ public class NyhetActivity extends FragmentActivity {
 	// For navigasjonsmeny (fra venstre)
 	private ActionBarDrawerToggle mDrawerToggle;
 
-	//Antall tabs i pageren
-	public static final int NUM_FRAGMENTS = 3;
+	private BmkPagerAdapter mPagerAdapter;
+	private FragmentManager mFragmentManager;
+	private FrameLayout     mFragmentContainer;
+	private ActionBar       mActionBar;
 
 
 	/** Hovedmetoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (SessionUtils.isLoggedIn()) {
+			setTheme(R.style.Theme_bmk_logged_in);
+		}
+
 		setContentView(R.layout.activity_nyheter);
-		setupViewPagerForSwiping();
+
+		//Pageren må ha en adapter som forteller hva som skal gjøres når vi swiper på siden.
+		if (mPagerAdapter == null) {
+			mFragmentManager = getSupportFragmentManager();
+			mPagerAdapter = new NyhetPagerAdapter(mFragmentManager);
+		}
+
+		mFragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer);
+		setupViewPager();
 		setupActionBar();
 		setupNavigationDrawer();
 	}
 
+
 	/** Setter opp action bar (tool bar) */
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void setupActionBar() {
 
 		//Setter dagens dato som subtittel
-		getActionBar().setSubtitle(DateUtil.getFormattedCurrentDate());
+		mActionBar = getActionBar();
 
-		//Setter bakgrunnsbilde
-		Drawable d = getResources().getDrawable(R.drawable.notes_2_trans);
-		getActionBar().setBackgroundDrawable(d);
-
-		//Setter opp en listener på tabene slik at vi kan velge et annet fragment
+		mActionBar.setSubtitle(DateUtil.getFormattedCurrentDate());
+//
+//		//Setter opp en listener på tabene slik at vi kan velge et annet fragment
 		//når vi trykker på en tab.
 		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 			public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
@@ -87,11 +98,14 @@ public class NyhetActivity extends FragmentActivity {
 		};
 
 		//Setter opp tabs
-		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		getActionBar().addTab(getActionBar().newTab().setText("Nyheter").setTabListener(tabListener));
-		getActionBar().addTab(getActionBar().newTab().setText("Aktiviteter").setTabListener(tabListener));
-		getActionBar().addTab(getActionBar().newTab().setText("Bilder").setTabListener(tabListener));
+		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mActionBar.removeAllTabs();
+		List<String> tabNames = mPagerAdapter.getTabNames();
+		for (String tabName : tabNames) {
+			mActionBar.addTab(getActionBar().newTab().setText(tabName).setTabListener(tabListener));
+		}
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,9 +121,8 @@ public class NyhetActivity extends FragmentActivity {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 			case R.id.action_login:
-				FragmentManager fm = getSupportFragmentManager();
 				LoginFragment dialog = LoginFragment.newInstance();
-				dialog.show(fm, "dialog_login");
+				dialog.show(mFragmentManager, "dialog_login");
 				return true;
 
 			default:
@@ -117,8 +130,9 @@ public class NyhetActivity extends FragmentActivity {
 		}
 	}
 
+
 	private void setupNavigationDrawer() {
-		DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mDrawerList.setAdapter(
 			new ArrayAdapter<>(
@@ -126,6 +140,33 @@ public class NyhetActivity extends FragmentActivity {
 				new String[]{"Nyheter og sosiale media", "Min profil", "Innstillinger"}));
 
 		mDrawerList.setSelection(0);
+		mDrawerList.setOnItemClickListener(
+			new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					System.out.println("Trykket på " + ((TextView) view).getText());
+					final FragmentManager fm = getSupportFragmentManager();
+
+					switch (position) {
+						case 0:
+							mPagerAdapter = new NyhetPagerAdapter(fm);
+							break;
+
+						case 1:
+							mPagerAdapter = new ProfilPagerAdapter(fm);
+							break;
+
+						case 2:
+							mPagerAdapter = new InnstillingerPagerAdapter(fm);
+							break;
+					}
+
+					mDrawerLayout.closeDrawer(Gravity.LEFT);
+					mFragmentContainer.removeView(mViewPager);
+					setupViewPager();
+					setupActionBar();
+				}
+			});
 
 		mDrawerToggle = new ActionBarDrawerToggle(
 			this,                  /* host Activity */
@@ -155,6 +196,8 @@ public class NyhetActivity extends FragmentActivity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 	}
 
+
+
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
@@ -165,13 +208,11 @@ public class NyhetActivity extends FragmentActivity {
 	}
 
 	/** Setter opp en pager for å støtte swiping mellom tabs */
-	private void setupViewPagerForSwiping() {
+	private void setupViewPager() {
 
 		mViewPager = new ViewPager(this);
 		mViewPager.setId(R.id.viewPager);
-
-		FrameLayout fl = (FrameLayout) findViewById(R.id.fragmentContainer);
-		fl.addView(mViewPager);
+		mFragmentContainer.addView(mViewPager);
 
 		//Når vi swiper, må vi også sørge for å endre valgt tab. ellers velger vi bare nytt
 		//fragment, uten å oppdatere valgt tab.
@@ -184,29 +225,6 @@ public class NyhetActivity extends FragmentActivity {
 			}
 		);
 
-		//Pageren må ha en adapter som forteller hva som skal gjøres når vi swiper på siden.
-		final FragmentManager fm = getSupportFragmentManager();
-		mViewPager.setAdapter(
-			new FragmentStatePagerAdapter(fm) {
-				@Override
-				public Fragment getItem(int position) {
-					switch (position) {
-						case 0:
-							return new NyhetlisteFragment();
-
-						case 1:
-							return new AktivitetlisteFragment();
-
-						default:
-							return new BildeFragment(NyhetActivity.this);
-					}
-				}
-
-				@Override
-				public int getCount() {
-					return NUM_FRAGMENTS;
-				}
-			}
-		);
+		mViewPager.setAdapter(mPagerAdapter);
 	}
 }

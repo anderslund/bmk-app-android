@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2014 Anders Lund
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +14,17 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
 
-	<item
-	  android:id="@+id/action_login"
-	  android:icon="@drawable/ic_action_person"
-	  android:title="@string/menu_action_login"
-	  android:showAsAction="ifRoom" />
+	<style name="Theme_bmk_logged_out" parent="android:Theme.Holo.Light">
+		<item name="android:actionBarStyle">@style/Widget.Bmk.ActionBar</item>
+	</style>
 
-</menu>
+	<style name="Theme_bmk_logged_in" parent="Theme_bmk_logged_out">
+		<item name="android:windowBackground">@drawable/bmk_logo_transparent_2</item>
+	</style>
+
+	<style name="Widget.Bmk.ActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid">
+		<item name="android:background">@drawable/notes_2_trans</item>
+	</style>
+</resources>

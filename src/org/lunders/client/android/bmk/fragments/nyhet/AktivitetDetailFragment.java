@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.util.DateUtil;
+import org.lunders.client.android.bmk.util.SessionUtils;
 
 
 public class AktivitetDetailFragment extends DialogFragment {
@@ -36,7 +40,9 @@ public class AktivitetDetailFragment extends DialogFragment {
 	private AbstractAktivitet mAktivitet;
 
 	public static final String EXTRA_AKTIVITET = "org.lunders.client.android.bmk.aktivitet_detalj";
-	public static final int COLOR_LINK_TEXT = 0xff33b5e5;
+	public static final int    COLOR_LINK_TEXT = 0xff33b5e5;
+
+	private static final String TAG = AktivitetDetailFragment.class.getSimpleName();
 
 
 	public static AktivitetDetailFragment newInstance(AbstractAktivitet a) {
@@ -103,13 +109,26 @@ public class AktivitetDetailFragment extends DialogFragment {
 		}
 		aktivitetIcon.setImageResource(resourceId);
 
-		Dialog d = new AlertDialog.Builder(getActivity())
+		final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity())
 			.setView(theView)
-			.setPositiveButton(android.R.string.ok, null)
-			.create();
+			.setPositiveButton(R.string.lukk, null);
 
-		d.setCanceledOnTouchOutside(true);
-		return d;
+		if (SessionUtils.isLoggedIn()) {
+			dialogBuilder.setNeutralButton(
+				R.string.kommer_ikke, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Log.i(TAG, SessionUtils.getLoggedInUserId() + " kommer ikke på " + mAktivitet.getAktivitetstype().toString().toLowerCase() + " " + DateUtil.getFormattedDateTime(mAktivitet.getTidspunktStart()));
+						//TODO: Toast?
+						//TODO: Markere aktiviteten på noe vis? Grået ut tekst? Rødaktig bakgrunn? Overstreket? Kryss over hele boksen?
+						//TODO: Send mail til gruppeleder/post@borgemusikken/dirigent
+					}
+				});
+		}
+
+		Dialog loginDialog = dialogBuilder.create();
+		loginDialog.setCanceledOnTouchOutside(true);
+		return loginDialog;
 	}
 
 	private void fireGoogleMaps(Sted sted) {

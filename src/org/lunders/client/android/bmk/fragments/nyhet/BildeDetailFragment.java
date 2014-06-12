@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,6 +24,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;

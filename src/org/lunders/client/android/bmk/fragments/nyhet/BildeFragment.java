@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
+import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 import org.lunders.client.android.bmk.services.impl.bilde.DownloadListener;
 import org.lunders.client.android.bmk.services.impl.bilde.ImageDownloader;
@@ -45,22 +45,20 @@ public class BildeFragment extends Fragment {
 	private InstagramBildeServiceHelper mInstagramBildeService;
 	private List<Bilde>                 mCurrentBilder;
 	private GridView                    mGridView;
-	private Context                     mContext;
+	private Activity                    mContext;
 	private ImageDownloader<ImageView>  mImageDownloader;
 
 	private static final String TAG = BildeFragment.class.getSimpleName();
 
 	public BildeFragment() {
-	}
-
-	public BildeFragment(Context context) {
-		mContext = context;
 		mInstagramBildeService = new InstagramBildeServiceHelper();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mContext = getActivity();
+
 		setupImageDownloader();
 
 		setRetainInstance(true);
@@ -199,7 +197,7 @@ public class BildeFragment extends Fragment {
 		public void run() {
 			try {
 				mCurrentBilder = mInstagramBildeService.hentBilder();
-				getActivity().runOnUiThread(
+				mContext.runOnUiThread(
 					new Runnable() {
 						@Override
 						public void run() {
@@ -208,7 +206,7 @@ public class BildeFragment extends Fragment {
 					});
 			}
 			catch (final IOException e) {
-				DisplayUtil.showToast((Activity) mContext, R.string.instagram_feil, Toast.LENGTH_LONG);
+				DisplayUtil.showToast(mContext, R.string.instagram_feil, Toast.LENGTH_LONG);
 			}
 		}
 	}
