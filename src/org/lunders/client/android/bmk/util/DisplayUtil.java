@@ -18,6 +18,7 @@ package org.lunders.client.android.bmk.util;
 
 import android.app.Activity;
 import android.widget.Toast;
+import org.lunders.client.android.bmk.R;
 
 public final class DisplayUtil {
 
@@ -25,11 +26,14 @@ public final class DisplayUtil {
 	}
 
 	public static void showToast(final Activity activity, final int resourceId, final int duration) {
+		//TODO: Bare hvis synlig
 		activity.runOnUiThread(
 			new Runnable() {
 				@Override
 				public void run() {
-					Toast.makeText(activity, resourceId, duration).show();
+					if (activity.findViewById(R.id.fragmentContainer).isShown()) {
+						Toast.makeText(activity, resourceId, duration).show();
+					}
 				}
 			}
 		);

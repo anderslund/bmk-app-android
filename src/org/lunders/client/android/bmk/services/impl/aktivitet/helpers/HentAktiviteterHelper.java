@@ -23,22 +23,17 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 import org.lunders.client.android.bmk.R;
-import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
-import org.lunders.client.android.bmk.model.aktivitet.Konsert;
-import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
-import org.lunders.client.android.bmk.model.aktivitet.Ovelse;
+import org.lunders.client.android.bmk.model.aktivitet.*;
 import org.lunders.client.android.bmk.model.lokasjon.Koordinater;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.impl.LocalStorageHelper;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +44,7 @@ public class HentAktiviteterHelper implements Runnable {
 	private AktivitetService.AktivitetListener mListener;
 	private List<AbstractAktivitet>            mCurrentAktiviteter;
 	private Context                            mContext;
+	private LocalStorageHelper mLocalStorageHelper;
 
 	private static final String GITHUB_AKTIVITETER
 		= "https://raw.githubusercontent.com/anderslund/bmk/master/aktiviteter/aktiviteter.yaml";
@@ -62,6 +58,7 @@ public class HentAktiviteterHelper implements Runnable {
 	public HentAktiviteterHelper(Context context, AktivitetService.AktivitetListener listener) {
 		mContext = context;
 		mListener = listener;
+		mLocalStorageHelper = LocalStorageHelper.getInstance(context);
 		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
@@ -71,7 +68,7 @@ public class HentAktiviteterHelper implements Runnable {
 
 		doHentAktiviteter();
 		if (mCurrentAktiviteter != null) {
-			storeAktiviteterToStorage(mCurrentAktiviteter);
+			mLocalStorageHelper.saveToStorage(AktivitetServiceImpl.AKTIVITET_CACHE, mCurrentAktiviteter);
 		}
 
 		mResponseHandler.post(
@@ -121,6 +118,11 @@ public class HentAktiviteterHelper implements Runnable {
 					aktivitet = oppdrag;
 					break;
 
+				case "Sosialt":
+					Sosialt sosialt = new Sosialt(navn, DateUtil.getDate(tidspunktStart));
+					aktivitet = sosialt;
+					break;
+
 				case "Konsert":
 					Konsert konsert = new Konsert(navn, DateUtil.getDate(tidspunktStart));
 					aktivitet = konsert;
@@ -152,19 +154,5 @@ public class HentAktiviteterHelper implements Runnable {
 		}
 
 		return new Sted((String) rawSted.get("Navn"), k);
-	}
-
-
-	private void storeAktiviteterToStorage(List<AbstractAktivitet> aktiviteter) {
-		try {
-			final FileOutputStream fos = mContext.openFileOutput(AktivitetServiceImpl.AKTIVITET_CACHE, Context.MODE_PRIVATE);
-			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(aktiviteter);
-			oos.flush();
-			fos.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

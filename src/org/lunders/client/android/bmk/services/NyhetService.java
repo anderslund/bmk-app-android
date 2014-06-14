@@ -26,11 +26,11 @@ public interface NyhetService {
 
 	void hentNyhet(Nyhet nyhet, NyhetDetaljListener listener);
 
-	static interface NyhetListener {
+	interface NyhetListener {
 		void onNyheterHentet(Collection<Nyhet> nyheter);
 	}
 
-	static interface NyhetDetaljListener {
+	interface NyhetDetaljListener {
 		void onNyhetHentet(Nyhet nyheten);
 	}
 }

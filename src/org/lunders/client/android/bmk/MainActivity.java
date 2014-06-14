@@ -21,6 +21,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -30,8 +31,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import org.lunders.client.android.bmk.fragments.adapters.BmkPagerAdapter;
+import org.lunders.client.android.bmk.fragments.adapters.InnstillingerPagerAdapter;
+import org.lunders.client.android.bmk.fragments.adapters.NyhetPagerAdapter;
+import org.lunders.client.android.bmk.fragments.adapters.ProfilPagerAdapter;
 import org.lunders.client.android.bmk.fragments.felles.LoginFragment;
-import org.lunders.client.android.bmk.util.BmkPagerAdapter;
+import org.lunders.client.android.bmk.fragments.felles.LogoutFragment;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.SessionUtils;
 
@@ -136,8 +141,8 @@ public class MainActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_login:
-				LoginFragment dialog = LoginFragment.newInstance();
-				dialog.show(mFragmentManager, "dialog_login");
+				DialogFragment dialog = SessionUtils.isLoggedIn() ? new LogoutFragment() : LoginFragment.newInstance();
+				dialog.show(mFragmentManager, "dialog_session");
 				return true;
 
 			default:
@@ -146,14 +151,13 @@ public class MainActivity extends FragmentActivity {
 	}
 
 
-	//TODO: Nav drawer skal bare være synlig dersom man har logget inn!
-	//TODO: Og når man logger inn, hadde det vært kult om draweren liksom fadet inn åpen og så lukket seg etter 500ms
+	//TODO: Når man logger inn, hadde det vært kult om draweren liksom fadet inn åpen og så lukket seg etter 500ms
 	private void setupNavigationDrawer() {
 		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mDrawerList.setAdapter(
 			new ArrayAdapter<>(
-				this, R.layout.drawer_list_item,
+				this, R.layout.drawer_list_item, R.id.drawer_item_text,
 				new String[]{"Nyheter og sosiale media", "Min profil", "Innstillinger"}));
 
 		mDrawerList.setSelection(0);
@@ -196,21 +200,22 @@ public class MainActivity extends FragmentActivity {
 			/** Called when a drawer has settled in a completely closed state. */
 			public void onDrawerClosed(View view) {
 				super.onDrawerClosed(view);
-				//getActionBar().setTitle(mTitle);
 			}
 
 			/** Called when a drawer has settled in a completely open state. */
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
-				//getActionBar().setTitle(mDrawerTitle);
 			}
 		};
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		//getActionBar().setDisplayHomeAsUpEnabled(true);
+		//getActionBar().setHomeButtonEnabled(true);
 
 		// Set the drawer toggle as the DrawerListener
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+		//TODO: Funker ikke helt
+		//mDrawerLayout.setDrawerLockMode(SessionUtils.isLoggedIn() ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 	}
 
 

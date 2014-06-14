@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk.model.aktivitet;
+package org.lunders.client.android.bmk.services;
 
-public enum Aktivitetstype {
-	Konsert, Øvelse, Ekstraøvelse, Oppdrag, Sosialt, Styremøte
+public interface ProfilService {
+
+	void hentMedlemsprofil(ProfilListener listener);
+
+	interface ProfilListener {
+		void onProfilHentet();
+	}
 }

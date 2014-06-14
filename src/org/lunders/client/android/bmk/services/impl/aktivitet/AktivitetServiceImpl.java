@@ -17,21 +17,18 @@
 package org.lunders.client.android.bmk.services.impl.aktivitet;
 
 import android.content.Context;
-import android.util.Log;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.impl.LocalStorageHelper;
 import org.lunders.client.android.bmk.services.impl.aktivitet.helpers.HentAktiviteterHelper;
 import org.lunders.client.android.bmk.util.ThreadPool;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Collection;
-import java.util.List;
 
 public class AktivitetServiceImpl implements AktivitetService {
 
-	private Context mContext;
+	private Context            mContext;
+	private LocalStorageHelper mLocalStorageHelper;
 
 	public static final  String AKTIVITET_CACHE = "aktivitetCache";
 	private static final String TAG             = AktivitetServiceImpl.class.getSimpleName();
@@ -39,6 +36,7 @@ public class AktivitetServiceImpl implements AktivitetService {
 
 	public AktivitetServiceImpl(Context context) {
 		mContext = context;
+		mLocalStorageHelper = LocalStorageHelper.getInstance(context);
 	}
 
 
@@ -47,24 +45,11 @@ public class AktivitetServiceImpl implements AktivitetService {
 		ThreadPool.getInstance().execute(new HentAktiviteterHelper(mContext, listener));
 
 		//Henter aktiviteter fra lokalt lager
-		Collection<AbstractAktivitet> cachedAktiviteter = loadAktiviteterFromStorage();
+		Collection<AbstractAktivitet> cachedAktiviteter = mLocalStorageHelper.loadFromStorage(AKTIVITET_CACHE);
 
 		//Dersom vi fikk noe fra lokalt lager, så sier vi fra om det.
 		if (cachedAktiviteter != null && !cachedAktiviteter.isEmpty()) {
 			listener.onAktiviteterHentet(cachedAktiviteter);
 		}
 	}
-
-	private List<AbstractAktivitet> loadAktiviteterFromStorage() {
-		try {
-			final FileInputStream fis = mContext.openFileInput(AKTIVITET_CACHE);
-			final ObjectInputStream ois = new ObjectInputStream(fis);
-			return (List<AbstractAktivitet>) ois.readObject();
-		}
-		catch (IOException | ClassNotFoundException e) {
-			Log.w(TAG, "Ingenting i aktivitet-cache: " + e.getMessage());
-		}
-		return null;
-	}
-
 }

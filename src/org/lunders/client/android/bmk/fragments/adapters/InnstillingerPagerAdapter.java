@@ -14,23 +14,31 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk.util;
+package org.lunders.client.android.bmk.fragments.adapters;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import org.lunders.client.android.bmk.fragments.nyhet.NyhetlisteFragment;
 
-import java.util.List;
+import java.util.Arrays;
 
-public abstract class BmkPagerAdapter extends FragmentStatePagerAdapter {
+public class InnstillingerPagerAdapter extends BmkPagerAdapter {
 
-	private List<String> tabNames;
+	//Antall tabs i pageren
+	public static final int NUM_FRAGMENTS = 1;
 
-	public BmkPagerAdapter(FragmentManager fm, List<String> tabNames) {
-		super(fm);
-		this.tabNames = tabNames;
+	public InnstillingerPagerAdapter(FragmentManager fm) {
+		super(fm, Arrays.asList("Innstillinger"));
 	}
 
-	public List<String> getTabNames() {
-		return tabNames;
+	@Override
+	public Fragment getItem(int position) {
+
+		return new NyhetlisteFragment();
+	}
+
+	@Override
+	public int getCount() {
+		return NUM_FRAGMENTS;
 	}
 }

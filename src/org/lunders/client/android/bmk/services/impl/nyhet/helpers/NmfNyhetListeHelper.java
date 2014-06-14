@@ -26,7 +26,9 @@ import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
+import org.lunders.client.android.bmk.services.impl.LocalStorageHelper;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.services.impl.nyhet.NmfNyhetServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
 import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
@@ -46,6 +48,7 @@ public class NmfNyhetListeHelper implements Runnable {
 	private NyhetService.NyhetListener mListener;
 	private Collection<Nyhet>          mNyheter;
 	private NetworkUtils               mNetworkUtils;
+	private LocalStorageHelper mLocalStorageHelper;
 
 	public static final String NMF_ENCODING = "UTF-8";
 	private static final String NMF_WEB_ROOT = "http://burns.idium.net/musikkorps.no/no/nyheter/?template=rssfeed";
@@ -57,6 +60,7 @@ public class NmfNyhetListeHelper implements Runnable {
 		mContext = context;
 		mListener = listener;
 		mNetworkUtils = NetworkUtils.getInstance(context);
+		mLocalStorageHelper = LocalStorageHelper.getInstance(context);
 		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
@@ -66,6 +70,7 @@ public class NmfNyhetListeHelper implements Runnable {
 
 		if (mNetworkUtils.isNetworkAvailable()) {
 			doHentNyheter();
+			mLocalStorageHelper.saveToStorage(NmfNyhetServiceImpl.NMF_NYHET_CACHE, mNyheter);
 		}
 
 		mResponseHandler.post(

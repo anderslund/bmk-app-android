@@ -14,14 +14,29 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@android:id/text1"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
   android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:textAppearance="?android:attr/textAppearanceSmall"
-  android:gravity="center_vertical"
-  android:paddingLeft="16dp"
-  android:paddingRight="16dp"
-  android:textColor="#fff"
-  android:background="?android:attr/activatedBackgroundIndicator"
-  android:minHeight="48dp"/>
+  android:layout_height="wrap_content">
+
+	<ImageView
+	  android:id="@+id/drawer_item_icon"
+	  android:layout_width="wrap_content"
+	  android:layout_height="wrap_content"
+	  android:layout_gravity="center_vertical"
+	  android:src="@drawable/ic_action_person" />
+
+	<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	  android:id="@+id/drawer_item_text"
+	  android:layout_width="match_parent"
+	  android:layout_height="wrap_content"
+	  android:textAppearance="?android:attr/textAppearanceSmall"
+	  android:gravity="center_vertical"
+	  android:paddingLeft="16dp"
+	  android:paddingRight="16dp"
+	  android:textColor="#fff"
+	  android:textStyle="bold"
+	  android:background="?android:attr/activatedBackgroundIndicator"
+	  android:minHeight="48dp" />
+
+</LinearLayout>

@@ -153,6 +153,9 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 				case Oppdrag:
 					resourceId = R.drawable.oppdrag_mynt;
 					break;
+				case Sosialt:
+					resourceId = R.drawable.ic_confetti;
+					break;
 				default:
 					resourceId = R.drawable.ic_konsert_trans;
 			}

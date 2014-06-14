@@ -14,38 +14,33 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk;
+package org.lunders.client.android.bmk.fragments.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import org.lunders.client.android.bmk.fragments.nyhet.AktivitetlisteFragment;
 import org.lunders.client.android.bmk.fragments.nyhet.BildeFragment;
-import org.lunders.client.android.bmk.fragments.nyhet.NyhetlisteFragment;
-import org.lunders.client.android.bmk.util.BmkPagerAdapter;
 
 import java.util.Arrays;
 
-class NyhetPagerAdapter extends BmkPagerAdapter {
+public class ProfilPagerAdapter extends BmkPagerAdapter {
 
 	//Antall tabs i pageren
-	public static final int NUM_FRAGMENTS = 3;
+	public static final int NUM_FRAGMENTS = 2;
 
 
-	public NyhetPagerAdapter(FragmentManager fm) {
-		super(fm, Arrays.asList("Nyheter", "Aktiviteter", "Bilder"));
+	public ProfilPagerAdapter(FragmentManager fm) {
+		super(fm, Arrays.asList("Mine opplysninger", "Riggegrupper"));
 	}
 
 	@Override
 	public Fragment getItem(int position) {
 		switch (position) {
 			case 0:
-				return new NyhetlisteFragment();
-
-			case 1:
-				return new AktivitetlisteFragment();
+				return new BildeFragment();
 
 			default:
-				return new BildeFragment();
+				return new AktivitetlisteFragment();
 		}
 	}
 

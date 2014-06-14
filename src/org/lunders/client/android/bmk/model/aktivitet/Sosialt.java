@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package org.lunders.client.android.bmk.services;
+package org.lunders.client.android.bmk.model.aktivitet;
 
-public interface BackendFileService {
+import java.util.Date;
 
-	void connect();
+public class Sosialt extends Oppdrag {
 
-	void addBackendListener(BackendFileServiceListener listener);
-
-	void removeBackendListener(BackendFileServiceListener listener);
-
-	void hentAktiviteter(AktivitetService.AktivitetListener listener);
-
-	static interface BackendFileServiceListener {
-		void onBackendReady(BackendFileService backend);
+	public Sosialt(String navn, Date tidspunktStart) {
+		super(navn, tidspunktStart);
+		setAktivitetstype(Aktivitetstype.Sosialt);
 	}
 }

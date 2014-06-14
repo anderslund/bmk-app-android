@@ -23,7 +23,7 @@ import java.util.Collection;
 public interface AktivitetService {
 	void hentAktiviteter(AktivitetListener listener);
 
-	static interface AktivitetListener {
+	interface AktivitetListener {
 		void onAktiviteterHentet(Collection<AbstractAktivitet> aktiviteter);
 	}
 }

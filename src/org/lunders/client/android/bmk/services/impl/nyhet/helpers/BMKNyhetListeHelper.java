@@ -26,7 +26,9 @@ import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
+import org.lunders.client.android.bmk.services.impl.LocalStorageHelper;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
+import org.lunders.client.android.bmk.services.impl.nyhet.BMKWebNyhetServiceImpl;
 import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
@@ -43,11 +45,12 @@ import java.util.regex.Pattern;
 
 public class BMKNyhetListeHelper implements Runnable {
 
-	private Handler                    mResponseHandler;
-	private NyhetService.NyhetListener mListener;
-	private Collection<Nyhet>          mNyheter;
-	private Context                    mContext;
-	private NetworkUtils               mNetworkUtils;
+	private       Handler                    mResponseHandler;
+	private       NyhetService.NyhetListener mListener;
+	private       Collection<Nyhet>          mNyheter;
+	private       Context                    mContext;
+	private       NetworkUtils               mNetworkUtils;
+	private final LocalStorageHelper         mLocalStorageHelper;
 
 	private static final String  BMK_NEWS_PAGE          = "default.asp?fid=1001";
 	private static final Pattern REGEX_DATO             = Pattern.compile("[a-zA-Z]*(\\d{1,2}\\.\\s*[a-zA-Z]*).*");
@@ -62,6 +65,7 @@ public class BMKNyhetListeHelper implements Runnable {
 		mContext = context;
 		mListener = listener;
 		mNetworkUtils = NetworkUtils.getInstance(context);
+		mLocalStorageHelper = LocalStorageHelper.getInstance(context);
 		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
@@ -69,6 +73,7 @@ public class BMKNyhetListeHelper implements Runnable {
 	public void run() {
 		if (mNetworkUtils.isNetworkAvailable()) {
 			doHentNyheter();
+			mLocalStorageHelper.saveToStorage(BMKWebNyhetServiceImpl.BMK_NYHET_CACHE, mNyheter);
 		}
 
 		mResponseHandler.post(

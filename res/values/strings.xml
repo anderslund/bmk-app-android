@@ -41,5 +41,8 @@
 	<string name="login_passord_mangler">Passord må oppgis</string>
 	<string name="login_brukernavn_mangler">Brukernavn må oppgis</string>
 	<string name="login_ok">Du er nå logget inn</string>
+	<string name="logout_message">Er du sikker på det?</string>
+	<string name="logout_title">Logg ut</string>
+	<string name="logout_ok">Du er nå logget ut</string>
 
 </resources>

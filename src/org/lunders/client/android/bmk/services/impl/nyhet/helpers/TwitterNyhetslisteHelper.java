@@ -30,14 +30,13 @@ import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.nyheter.Nyhet;
 import org.lunders.client.android.bmk.model.nyheter.Nyhetskilde;
 import org.lunders.client.android.bmk.services.NyhetService;
+import org.lunders.client.android.bmk.services.impl.LocalStorageHelper;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.services.impl.nyhet.TwitterNyhetServiceImpl;
 import org.lunders.client.android.bmk.util.DisplayUtil;
 import org.lunders.client.android.bmk.util.NetworkUtils;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -47,8 +46,9 @@ public class TwitterNyhetslisteHelper implements Runnable {
 	private Handler                    mResponseHandler;
 	private Context                    mContext;
 	private NyhetService.NyhetListener mListener;
-	private Collection<Nyhet>          nyheter;
+	private Collection<Nyhet>  mNyheter;
 	private NetworkUtils               mNetworkUtils;
+	private LocalStorageHelper mLocalStorageHelper;
 
 	public static final  String TWITTER_ENCODING   = "UTF-8";
 	private static final String TWITTER_SEARCH_URL =
@@ -62,16 +62,17 @@ public class TwitterNyhetslisteHelper implements Runnable {
 		mContext = context;
 		mListener = listener;
 		mNetworkUtils = NetworkUtils.getInstance(context);
+		mLocalStorageHelper = LocalStorageHelper.getInstance(context);
 		mResponseHandler = new Handler(Looper.getMainLooper());
 	}
 
 	@Override
 	public void run() {
 
-		//Fyrer av henting av nyheter fra Twitter i bakgrunnen, hvis vi har nettverk
+		//Fyrer av henting av mNyheter fra Twitter i bakgrunnen, hvis vi har nettverk
 		if (mNetworkUtils.isNetworkAvailable()) {
-			nyheter = doHentNyheter();
-			storeNyheterToStorage(nyheter);
+			mNyheter = doHentNyheter();
+			mLocalStorageHelper.saveToStorage(TwitterNyhetServiceImpl.TWITTER_NYHET_CACHE, mNyheter);
 		}
 
 		//Her leverer vi resultatet fra bakgrunnsjobben til UI-tråden.
@@ -79,14 +80,14 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			new Runnable() {
 				@Override
 				public void run() {
-					mListener.onNyheterHentet(nyheter);
+					mListener.onNyheterHentet(mNyheter);
 				}
 			}
 		);
 	}
 
 	private Collection<Nyhet> doHentNyheter() {
-		Log.i(TAG, "Henter nyheter fra Twitter...");
+		Log.i(TAG, "Henter mNyheter fra Twitter...");
 
 		String searchResultHtml;
 		try {
@@ -94,7 +95,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 		}
 		catch (IOException e) {
 			DisplayUtil.showToast((Activity) mContext, R.string.twitter_nyheter_feil, Toast.LENGTH_LONG);
-			Log.e(TAG, "Klarte ikke å hente nyheter fra Twitter", e);
+			Log.e(TAG, "Klarte ikke å hente mNyheter fra Twitter", e);
 			return null;
 		}
 
@@ -136,21 +137,7 @@ public class TwitterNyhetslisteHelper implements Runnable {
 			tweetStartIndex = searchResultHtml.indexOf("<div class=\"tweet ", tweetEndIndex + 1);
 		}
 
-		Log.i(TAG, "Har hentet nyheter fra Twitter.");
+		Log.i(TAG, "Har hentet mNyheter fra Twitter.");
 		return nyheter;
-	}
-
-	// Lagrer nyhetene lokalt på enheten
-	private void storeNyheterToStorage(Collection<Nyhet> nyheter) {
-		try {
-			final FileOutputStream fos = mContext.openFileOutput(TwitterNyhetServiceImpl.TWITTER_NYHET_CACHE, Context.MODE_PRIVATE);
-			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(nyheter);
-			oos.flush();
-			fos.close();
-		}
-		catch (IOException e) {
-			Log.w(TAG, "Klarte ikke å lagre nyheter lokalt", e);
-		}
 	}
 }

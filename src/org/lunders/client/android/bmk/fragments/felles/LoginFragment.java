@@ -57,8 +57,6 @@ public class LoginFragment extends DialogFragment {
 
 						dismiss();
 						if (loginStatus == SessionUtils.LoginStatus.OK) {
-							//TODO: Endre til Logg Ut-ikon (Theme?)
-							//TODO: Endre "Borgemusikken" i task bar til brukerens navn
 							getActivity().recreate();
 							DisplayUtil.showToast(getActivity(), R.string.login_ok, Toast.LENGTH_LONG);
 						}

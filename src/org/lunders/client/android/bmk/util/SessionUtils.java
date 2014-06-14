@@ -23,7 +23,7 @@ import java.security.MessageDigest;
 public class SessionUtils {
 
 	private static String loggedInUserId;
-	private static String loggedInUserDisplayName = "Anders Lund";
+	private static String loggedInUserDisplayName;
 	private static boolean localSessionRead;
 
 	public enum LoginStatus {OK, BAD_CREDENTIALS, MISSING_USERNAME, MISSING_PASSWORD, COMM_FAILURE}
@@ -39,6 +39,12 @@ public class SessionUtils {
 		catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
+	}
+
+	public static LoginStatus doLogout() {
+		loggedInUserDisplayName = null;
+		loggedInUserId = null;
+		return LoginStatus.OK;
 	}
 
 
@@ -57,6 +63,9 @@ public class SessionUtils {
 		Log.i(TAG, "Logging in " + username + " with " + hashed);
 
 		loggedInUserId = username.toString();
+		loggedInUserDisplayName = "Anders Lund";
+
+		//TODO: Skriv token til lokalt om at brukeren er logget på
 		return LoginStatus.OK;
 	}
 
@@ -71,7 +80,6 @@ public class SessionUtils {
 		//TODO: Send et kall til GitHub med nytt passord for brukeren og commit.
 
 		return LoginStatus.OK;
-
 	}
 
 
@@ -90,6 +98,7 @@ public class SessionUtils {
 
 
 	private static String getLoggedInUserIdFromLocalStorage() {
+
 		localSessionRead = true;
 		return null;
 	}
@@ -110,7 +119,8 @@ public class SessionUtils {
 		SessionUtils.loggedInUserDisplayName = loggedInUserDisplayName;
 	}
 
-	public static String hashEncode(String stringToEncode) {
+
+	private static String hashEncode(String stringToEncode) {
 
 		byte[] digest;
 		synchronized (DIGEST) {
