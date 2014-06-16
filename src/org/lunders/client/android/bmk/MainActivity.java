@@ -37,8 +37,9 @@ import org.lunders.client.android.bmk.fragments.adapters.NyhetPagerAdapter;
 import org.lunders.client.android.bmk.fragments.adapters.ProfilPagerAdapter;
 import org.lunders.client.android.bmk.fragments.felles.LoginFragment;
 import org.lunders.client.android.bmk.fragments.felles.LogoutFragment;
+import org.lunders.client.android.bmk.services.SessionService;
+import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
-import org.lunders.client.android.bmk.util.SessionUtils;
 
 import java.util.List;
 
@@ -58,13 +59,15 @@ public class MainActivity extends FragmentActivity {
 	private FragmentManager mFragmentManager;
 	private FrameLayout     mFragmentContainer;
 	private ActionBar       mActionBar;
+	private SessionService mSessionService;
 
 
 	/** Hovedmetoden i en aktivitet. Tilsvarende main i en vanlig Java-app */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (SessionUtils.isLoggedIn()) {
+		mSessionService = SessionServiceImpl.getInstance(this);
+		if (mSessionService.isLoggedIn()) {
 			//TODO: Litt kult bakgrunnsbilde. Ser for meg BMK-logoen med speilbilde som et fjell bak en sjø :-)
 			setTheme(R.style.Theme_bmk_logged_in);
 		}
@@ -78,7 +81,7 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		mFragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer);
-		if (SessionUtils.isLoggedIn()) {
+		if (mSessionService.isLoggedIn()) {
 			mFragmentContainer.setBackgroundResource(R.drawable.background_gradient);
 		}
 		setupViewPager();
@@ -92,8 +95,8 @@ public class MainActivity extends FragmentActivity {
 
 		//Setter dagens dato som subtittel
 		mActionBar = getActionBar();
-		if (SessionUtils.isLoggedIn()) {
-			mActionBar.setTitle(SessionUtils.getLoggedInUserDisplayName());
+		if (mSessionService.isLoggedIn()) {
+			mActionBar.setTitle(mSessionService.getCurrentUserDisplayName());
 		}
 
 		mActionBar.setSubtitle(DateUtil.getFormattedCurrentDate());
@@ -128,7 +131,7 @@ public class MainActivity extends FragmentActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.nyhet_activity_actions, menu);
 
-		if (SessionUtils.isLoggedIn()) {
+		if (mSessionService.isLoggedIn()) {
 			menu.findItem(R.id.action_login).setIcon(R.drawable.ic_action_secure);
 			menu.findItem(R.id.action_login).setTitle(R.string.menu_action_logout);
 		}
@@ -141,7 +144,7 @@ public class MainActivity extends FragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.action_login:
-				DialogFragment dialog = SessionUtils.isLoggedIn() ? new LogoutFragment() : LoginFragment.newInstance();
+				DialogFragment dialog = mSessionService.isLoggedIn() ? new LogoutFragment() : LoginFragment.newInstance();
 				dialog.show(mFragmentManager, "dialog_session");
 				return true;
 

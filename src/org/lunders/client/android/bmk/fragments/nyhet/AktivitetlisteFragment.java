@@ -31,9 +31,10 @@ import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.aktivitet.Oppdrag;
 import org.lunders.client.android.bmk.services.AktivitetService;
+import org.lunders.client.android.bmk.services.SessionService;
 import org.lunders.client.android.bmk.services.impl.aktivitet.AktivitetServiceImpl;
+import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
-import org.lunders.client.android.bmk.util.SessionUtils;
 import org.lunders.client.android.bmk.util.StringUtil;
 
 import java.io.Serializable;
@@ -43,6 +44,7 @@ import java.util.Collection;
 public class AktivitetlisteFragment extends ListFragment implements AktivitetService.AktivitetListener {
 
 	private AktivitetService                mAktivitetService;
+	private SessionService mSessionService;
 	private Collection<AbstractAktivitet>   mCurrentAktiviteter;
 	private ArrayAdapter<AbstractAktivitet> mListAdapter;
 
@@ -54,6 +56,7 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 		super.onCreate(savedInstanceState);
 		mCurrentAktiviteter = new ArrayList<>();
 		mAktivitetService = new AktivitetServiceImpl(getActivity());
+		mSessionService = SessionServiceImpl.getInstance(getActivity());
 	}
 
 
@@ -91,7 +94,7 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 		//Viser ikke oppdragsaktiviteter dersom vi ikke er logget inn
 		mCurrentAktiviteter.clear();
 		for (AbstractAktivitet aktivitet : aktiviteter) {
-			if (aktivitet instanceof Oppdrag && !SessionUtils.isLoggedIn()) {
+			if (aktivitet instanceof Oppdrag && !mSessionService.isLoggedIn()) {
 				continue;
 			}
 			mCurrentAktiviteter.add(aktivitet);

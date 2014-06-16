@@ -25,11 +25,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.lunders.client.android.bmk.R;
+import org.lunders.client.android.bmk.services.SessionService;
+import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DisplayUtil;
-import org.lunders.client.android.bmk.util.SessionUtils;
 
 
-public class LoginFragment extends DialogFragment {
+public class LoginFragment extends DialogFragment implements SessionService.LoginListener {
+
+	private SessionService mSessionService;
 
 	public static LoginFragment newInstance() {
 		LoginFragment fragment = new LoginFragment();
@@ -38,7 +41,7 @@ public class LoginFragment extends DialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-
+		mSessionService = SessionServiceImpl.getInstance(getActivity());
 		View theView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login, null);
 
 		final TextView tvUsername = (TextView) theView.findViewById(R.id.login_username);
@@ -53,25 +56,8 @@ public class LoginFragment extends DialogFragment {
 					public void onClick(DialogInterface dialog, int id) {
 						CharSequence username = tvUsername.getText();
 						CharSequence password = tvPassword.getText();
-						final SessionUtils.LoginStatus loginStatus = SessionUtils.doLogin(username, password);
-
+						mSessionService.login(username, password, LoginFragment.this);
 						dismiss();
-						if (loginStatus == SessionUtils.LoginStatus.OK) {
-							getActivity().recreate();
-							DisplayUtil.showToast(getActivity(), R.string.login_ok, Toast.LENGTH_LONG);
-						}
-						else if (loginStatus == SessionUtils.LoginStatus.MISSING_USERNAME) {
-							DisplayUtil.showToast(getActivity(), R.string.login_brukernavn_mangler, Toast.LENGTH_LONG);
-						}
-						else if (loginStatus == SessionUtils.LoginStatus.MISSING_PASSWORD) {
-							DisplayUtil.showToast(getActivity(), R.string.login_passord_mangler, Toast.LENGTH_LONG);
-						}
-						else if (loginStatus == SessionUtils.LoginStatus.BAD_CREDENTIALS) {
-							DisplayUtil.showToast(getActivity(), R.string.login_bad_creds, Toast.LENGTH_LONG);
-						}
-						else if (loginStatus == SessionUtils.LoginStatus.COMM_FAILURE) {
-							DisplayUtil.showToast(getActivity(), R.string.login_comm_failure, Toast.LENGTH_LONG);
-						}
 					}
 				})
 
@@ -83,4 +69,25 @@ public class LoginFragment extends DialogFragment {
 				});
 		return builder.create();
 	}
+
+	@Override
+	public void loginAttempted(SessionService.LoginStatus loginStatus) {
+		if (loginStatus == SessionServiceImpl.LoginStatus.OK) {
+			getActivity().recreate();
+			DisplayUtil.showToast(getActivity(), R.string.login_ok, Toast.LENGTH_LONG);
+		}
+		else if (loginStatus == SessionServiceImpl.LoginStatus.MISSING_USERNAME) {
+			DisplayUtil.showToast(getActivity(), R.string.login_brukernavn_mangler, Toast.LENGTH_LONG);
+		}
+		else if (loginStatus == SessionServiceImpl.LoginStatus.MISSING_PASSWORD) {
+			DisplayUtil.showToast(getActivity(), R.string.login_passord_mangler, Toast.LENGTH_LONG);
+		}
+		else if (loginStatus == SessionServiceImpl.LoginStatus.BAD_CREDENTIALS) {
+			DisplayUtil.showToast(getActivity(), R.string.login_bad_creds, Toast.LENGTH_LONG);
+		}
+		else if (loginStatus == SessionServiceImpl.LoginStatus.COMM_FAILURE) {
+			DisplayUtil.showToast(getActivity(), R.string.login_comm_failure, Toast.LENGTH_LONG);
+		}
+	}
+
 }

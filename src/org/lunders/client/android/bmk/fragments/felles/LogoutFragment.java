@@ -23,14 +23,19 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
 import org.lunders.client.android.bmk.R;
+import org.lunders.client.android.bmk.services.SessionService;
+import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DisplayUtil;
-import org.lunders.client.android.bmk.util.SessionUtils;
 
 
-public class LogoutFragment extends DialogFragment {
+public class LogoutFragment extends DialogFragment implements SessionService.LogoutListener {
+
+	private SessionServiceImpl mSessionService;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+		mSessionService = SessionServiceImpl.getInstance(getActivity());
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
 			.setMessage(R.string.logout_message)
@@ -40,10 +45,8 @@ public class LogoutFragment extends DialogFragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						SessionUtils.doLogout();
+						mSessionService.logout(LogoutFragment.this);
 						dismiss();
-						getActivity().recreate();
-						DisplayUtil.showToast(getActivity(), R.string.logout_ok, Toast.LENGTH_LONG);
 					}
 				})
 
@@ -55,4 +58,11 @@ public class LogoutFragment extends DialogFragment {
 				});
 		return builder.create();
 	}
+
+	@Override
+	public void logoutAttempted(SessionService.LoginStatus status) {
+		getActivity().recreate();
+		DisplayUtil.showToast(getActivity(), R.string.logout_ok, Toast.LENGTH_LONG);
+	}
+
 }

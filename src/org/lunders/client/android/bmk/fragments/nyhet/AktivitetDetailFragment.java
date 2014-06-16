@@ -31,13 +31,15 @@ import android.widget.TextView;
 import org.lunders.client.android.bmk.R;
 import org.lunders.client.android.bmk.model.aktivitet.AbstractAktivitet;
 import org.lunders.client.android.bmk.model.lokasjon.Sted;
+import org.lunders.client.android.bmk.services.SessionService;
+import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
-import org.lunders.client.android.bmk.util.SessionUtils;
 
 
 public class AktivitetDetailFragment extends DialogFragment {
 
 	private AbstractAktivitet mAktivitet;
+	private SessionService mSessionService;
 
 	public static final String EXTRA_AKTIVITET = "org.lunders.client.android.bmk.aktivitet_detalj";
 	public static final int    COLOR_LINK_TEXT = 0xff33b5e5;
@@ -56,6 +58,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		mSessionService = SessionServiceImpl.getInstance(getActivity());
 
 		View theView = getActivity().getLayoutInflater().inflate(R.layout.dialog_aktivitet_detalj, null);
 		mAktivitet = (AbstractAktivitet) getArguments().getSerializable(EXTRA_AKTIVITET);
@@ -113,12 +116,12 @@ public class AktivitetDetailFragment extends DialogFragment {
 			.setView(theView)
 			.setPositiveButton(R.string.lukk, null);
 
-		if (SessionUtils.isLoggedIn()) {
+		if (mSessionService.isLoggedIn()) {
 			dialogBuilder.setNeutralButton(
 				R.string.kommer_ikke, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Log.i(TAG, SessionUtils.getLoggedInUserId() + " kommer ikke på " + mAktivitet.getAktivitetstype().toString().toLowerCase() + " " + DateUtil.getFormattedDateTime(mAktivitet.getTidspunktStart()));
+						Log.i(TAG, mSessionService.getCurrentUserDisplayName() + " kommer ikke på " + mAktivitet.getAktivitetstype().toString().toLowerCase() + " " + DateUtil.getFormattedDateTime(mAktivitet.getTidspunktStart()));
 						//TODO: Toast?
 						//TODO: Markere aktiviteten på noe vis? Grået ut tekst? Rødaktig bakgrunn? Overstreket? Kryss over hele boksen?
 						//TODO: Send mail til gruppeleder/post@borgemusikken/dirigent
