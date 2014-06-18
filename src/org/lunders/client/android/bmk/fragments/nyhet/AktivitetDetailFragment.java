@@ -98,6 +98,13 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 		ImageView aktivitetIcon = (ImageView) theView.findViewById(R.id.aktivitetListIcon);
 
+		if (System.currentTimeMillis() > mAktivitet.getTidspunktStart().getTime()) {
+			aktivitetHeader.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			aktivitetStart.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			aktivitetContent.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			tvSted.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		}
+
 		int resourceId;
 		switch (mAktivitet.getAktivitetstype()) {
 			case Øvelse:
@@ -116,7 +123,7 @@ public class AktivitetDetailFragment extends DialogFragment {
 			.setView(theView)
 			.setPositiveButton(R.string.lukk, null);
 
-		if (mSessionService.isLoggedIn()) {
+		if (mSessionService.isLoggedIn() && mAktivitet.getTidspunktStart() != null && mAktivitet.getTidspunktStart().getTime() > System.currentTimeMillis()) {
 			dialogBuilder.setNeutralButton(
 				R.string.kommer_ikke, new DialogInterface.OnClickListener() {
 					@Override

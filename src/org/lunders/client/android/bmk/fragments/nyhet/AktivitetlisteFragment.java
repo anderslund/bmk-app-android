@@ -17,6 +17,7 @@
 package org.lunders.client.android.bmk.fragments.nyhet;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
@@ -144,6 +145,12 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 
 			TextView aktivitetContent = (TextView) theView.findViewById(R.id.aktivitetListContent);
 			aktivitetContent.setText(StringUtil.truncate(aktivitet.getBeskrivelse(), 100));
+
+			if (System.currentTimeMillis() > aktivitet.getTidspunktStart().getTime()) {
+				aktivitetHeader.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+				aktivitetStart.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+				aktivitetContent.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			}
 
 			ImageView aktivitetIcon = (ImageView) theView.findViewById(R.id.aktivitetListIcon);
 
