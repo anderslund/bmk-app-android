@@ -19,12 +19,13 @@ package org.lunders.client.android.bmk.services.impl.session;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import org.lunders.client.android.bmk.services.SessionService;
 import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.util.StringUtil;
 import org.lunders.client.android.bmk.util.ThreadPool;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.security.MessageDigest;
 
 public class SessionServiceImpl implements SessionService {
@@ -38,6 +39,8 @@ public class SessionServiceImpl implements SessionService {
 	private static final MessageDigest DIGEST;
 
 	private static SessionServiceImpl INSTANCE;
+
+	public static final String SESSION_CACHE = "sessionCache";
 
 	private static final String GITHUB_SESSION_PREFIX
 		= "https://raw.githubusercontent.com/anderslund/bmk/master/users/";
@@ -71,6 +74,7 @@ public class SessionServiceImpl implements SessionService {
 	public void logout(LogoutListener listener) {
 		mLoggedInUserDisplayName = null;
 		mLoggedInUserId = null;
+		removeCredsFromLocalStorage();
 		sendValue(LoginStatus.OK, listener);
 	}
 
@@ -114,8 +118,13 @@ public class SessionServiceImpl implements SessionService {
 						mLoggedInUserId = username.toString();
 						mLoggedInUserDisplayName = displayName;
 
-						//TODO: Skriv token til lokalt om at brukeren er logget på
 						sendValue(LoginStatus.OK, listener);
+
+						final FileOutputStream fileOutputStream = mContext.openFileOutput(SESSION_CACHE, Context.MODE_PRIVATE);
+						PrintWriter writer = new PrintWriter(new OutputStreamWriter(fileOutputStream));
+						writer.println(mLoggedInUserId + ":" + mLoggedInUserDisplayName);
+						writer.flush();
+						writer.close();
 					}
 					catch (FileNotFoundException e) {
 						sendValue(LoginStatus.BAD_CREDENTIALS, listener);
@@ -147,14 +156,32 @@ public class SessionServiceImpl implements SessionService {
 			return false;
 		}
 
-		mLoggedInUserId = getLoggedInUserIdFromLocalStorage();
+		establishCredentialsFromLocalStorage();
 		return mLoggedInUserId != null;
 	}
 
 
-	private String getLoggedInUserIdFromLocalStorage() {
-		mLocalSessionRead = true;
-		return null;
+	private void establishCredentialsFromLocalStorage() {
+		try {
+			final FileInputStream fileInputStream = mContext.openFileInput(SESSION_CACHE);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+			String creds = reader.readLine();
+			String[] splitCreds = creds.split(":");
+			mLoggedInUserId = splitCreds[0];
+			mLoggedInUserDisplayName = splitCreds[1];
+			Log.i(TAG, "Creds hentet fra lokalt lager");
+		}
+		catch (IOException e) {
+			Log.i(TAG, "Fant ikke creds i lokalt lager");
+		}
+		finally {
+			mLocalSessionRead = true;
+		}
+	}
+
+	private void removeCredsFromLocalStorage() {
+		mContext.deleteFile(SESSION_CACHE);
+		Log.i(TAG, "Creds fjernet fra lokalt lager");
 	}
 
 	public String getCurrentUserID() {

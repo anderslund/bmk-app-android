@@ -69,6 +69,7 @@ public class MainActivity extends FragmentActivity {
 		mSessionService = SessionServiceImpl.getInstance(this);
 		if (mSessionService.isLoggedIn()) {
 			//TODO: Litt kult bakgrunnsbilde. Ser for meg BMK-logoen med speilbilde som et fjell bak en sjø :-)
+			//Evt (kanskje bedre) Et bilde som samsvarer med kommende prosjekt (plakat)
 			setTheme(R.style.Theme_bmk_logged_in);
 		}
 
