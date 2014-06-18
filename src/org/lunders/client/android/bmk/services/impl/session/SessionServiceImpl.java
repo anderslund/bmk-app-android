@@ -19,10 +19,12 @@ package org.lunders.client.android.bmk.services.impl.session;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import org.lunders.client.android.bmk.services.SessionService;
+import org.lunders.client.android.bmk.services.impl.ServiceHelper;
 import org.lunders.client.android.bmk.util.StringUtil;
+import org.lunders.client.android.bmk.util.ThreadPool;
 
+import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 
 public class SessionServiceImpl implements SessionService {
@@ -35,9 +37,12 @@ public class SessionServiceImpl implements SessionService {
 
 	private static final MessageDigest DIGEST;
 
-	private static final String TAG = SessionServiceImpl.class.getSimpleName();
-
 	private static SessionServiceImpl INSTANCE;
+
+	private static final String GITHUB_SESSION_PREFIX
+		= "https://raw.githubusercontent.com/anderslund/bmk/master/users/";
+
+	private static final String TAG = SessionServiceImpl.class.getSimpleName();
 
 	static {
 		try {
@@ -70,7 +75,7 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 
-	public void login(CharSequence username, CharSequence password, final LoginListener listener) {
+	public void login(final CharSequence username, final CharSequence password, final LoginListener listener) {
 		if (StringUtil.isBlank(username)) {
 			sendValue(LoginStatus.MISSING_USERNAME, listener);
 			return;
@@ -81,16 +86,47 @@ public class SessionServiceImpl implements SessionService {
 			return;
 		}
 
-		String hashBase = username.toString() + password.toString();
-		String hashed = hashEncode(hashBase);
+		ThreadPool.getInstance().execute(
+			new Runnable() {
+				@Override
+				public void run() {
+					try {
+						byte[] bytes = ServiceHelper.hentRaadata(GITHUB_SESSION_PREFIX + username);
 
-		Log.i(TAG, "Logging in " + username + " with " + hashed);
+						if (bytes == null) {
+							sendValue(LoginStatus.BAD_CREDENTIALS, listener);
+							return;
+						}
 
-		mLoggedInUserId = username.toString();
-		mLoggedInUserDisplayName = "Anders Lund";
+						String userData = new String(bytes, "UTF-8");
 
-		//TODO: Skriv token til lokalt om at brukeren er logget på
-		sendValue(LoginStatus.OK, listener);
+						String[] tokens = userData.split(":");
+						String displayName = tokens[0];
+						String storedHash = tokens[1];
+
+						String hashBase = username.toString() + password.toString();
+						String hashed = hashEncode(hashBase);
+						if (!hashed.equals(storedHash)) {
+							sendValue(LoginStatus.BAD_CREDENTIALS, listener);
+							return;
+						}
+
+						mLoggedInUserId = username.toString();
+						mLoggedInUserDisplayName = displayName;
+
+						//TODO: Skriv token til lokalt om at brukeren er logget på
+						sendValue(LoginStatus.OK, listener);
+					}
+					catch (FileNotFoundException e) {
+						sendValue(LoginStatus.BAD_CREDENTIALS, listener);
+						return;
+					}
+					catch (Exception e) {
+						sendValue(LoginStatus.COMM_FAILURE, listener);
+						return;
+					}
+				}
+			});
 	}
 
 

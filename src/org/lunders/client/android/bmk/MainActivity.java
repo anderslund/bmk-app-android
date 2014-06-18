@@ -211,7 +211,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		};
 
-		//getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		//getActionBar().setHomeButtonEnabled(true);
 
 		// Set the drawer toggle as the DrawerListener

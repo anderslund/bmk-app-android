@@ -16,6 +16,7 @@
 
 package org.lunders.client.android.bmk.fragments.felles;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -33,6 +34,7 @@ import org.lunders.client.android.bmk.util.DisplayUtil;
 public class LoginFragment extends DialogFragment implements SessionService.LoginListener {
 
 	private SessionService mSessionService;
+	private Activity mActivity;
 
 	public static LoginFragment newInstance() {
 		LoginFragment fragment = new LoginFragment();
@@ -41,13 +43,13 @@ public class LoginFragment extends DialogFragment implements SessionService.Logi
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		mSessionService = SessionServiceImpl.getInstance(getActivity());
-		View theView = getActivity().getLayoutInflater().inflate(R.layout.dialog_login, null);
+		mSessionService = SessionServiceImpl.getInstance(mActivity = getActivity());
+		View theView = mActivity.getLayoutInflater().inflate(R.layout.dialog_login, null);
 
 		final TextView tvUsername = (TextView) theView.findViewById(R.id.login_username);
 		final TextView tvPassword = (TextView) theView.findViewById(R.id.login_password);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
 		builder.setView(theView)
 
 			.setPositiveButton(
@@ -72,22 +74,27 @@ public class LoginFragment extends DialogFragment implements SessionService.Logi
 
 	@Override
 	public void loginAttempted(SessionService.LoginStatus loginStatus) {
-		if (loginStatus == SessionServiceImpl.LoginStatus.OK) {
-			getActivity().recreate();
-			DisplayUtil.showToast(getActivity(), R.string.login_ok, Toast.LENGTH_LONG);
-		}
-		else if (loginStatus == SessionServiceImpl.LoginStatus.MISSING_USERNAME) {
-			DisplayUtil.showToast(getActivity(), R.string.login_brukernavn_mangler, Toast.LENGTH_LONG);
-		}
-		else if (loginStatus == SessionServiceImpl.LoginStatus.MISSING_PASSWORD) {
-			DisplayUtil.showToast(getActivity(), R.string.login_passord_mangler, Toast.LENGTH_LONG);
-		}
-		else if (loginStatus == SessionServiceImpl.LoginStatus.BAD_CREDENTIALS) {
-			DisplayUtil.showToast(getActivity(), R.string.login_bad_creds, Toast.LENGTH_LONG);
-		}
-		else if (loginStatus == SessionServiceImpl.LoginStatus.COMM_FAILURE) {
-			DisplayUtil.showToast(getActivity(), R.string.login_comm_failure, Toast.LENGTH_LONG);
+		switch (loginStatus) {
+			case OK:
+				mActivity.recreate();
+				DisplayUtil.showToast(mActivity, R.string.login_ok, Toast.LENGTH_LONG);
+				break;
+
+			case MISSING_USERNAME:
+				DisplayUtil.showToast(mActivity, R.string.login_brukernavn_mangler, Toast.LENGTH_LONG);
+				break;
+
+			case MISSING_PASSWORD:
+				DisplayUtil.showToast(mActivity, R.string.login_passord_mangler, Toast.LENGTH_LONG);
+				break;
+
+			case BAD_CREDENTIALS:
+				DisplayUtil.showToast(mActivity, R.string.login_bad_creds, Toast.LENGTH_LONG);
+				break;
+
+			case COMM_FAILURE:
+				DisplayUtil.showToast(mActivity, R.string.login_comm_failure, Toast.LENGTH_LONG);
+				break;
 		}
 	}
-
 }
