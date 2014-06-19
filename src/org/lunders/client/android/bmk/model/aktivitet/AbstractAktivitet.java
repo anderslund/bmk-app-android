@@ -28,6 +28,7 @@ public abstract class AbstractAktivitet implements Comparable<AbstractAktivitet>
 	private Sted sted;
 	private Date tidspunktStart, tidspunktSlutt;
 	private Aktivitetstype aktivitetstype;
+	private boolean deltar = Math.random() > 0.5; //TODO
 
 	public AbstractAktivitet(String navn, Date tidspunktStart) {
 		this.navn = navn;
@@ -87,6 +88,14 @@ public abstract class AbstractAktivitet implements Comparable<AbstractAktivitet>
 
 	public void setAktivitetstype(Aktivitetstype aktivitetstype) {
 		this.aktivitetstype = aktivitetstype;
+	}
+
+	public boolean isDeltar() {
+		return deltar;
+	}
+
+	public void setDeltar(boolean deltar) {
+		this.deltar = deltar;
 	}
 
 	@Override

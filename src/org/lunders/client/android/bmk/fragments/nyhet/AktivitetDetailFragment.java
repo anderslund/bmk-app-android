@@ -24,7 +24,6 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,6 +33,8 @@ import org.lunders.client.android.bmk.model.lokasjon.Sted;
 import org.lunders.client.android.bmk.services.SessionService;
 import org.lunders.client.android.bmk.services.impl.session.SessionServiceImpl;
 import org.lunders.client.android.bmk.util.DateUtil;
+
+import java.text.MessageFormat;
 
 
 public class AktivitetDetailFragment extends DialogFragment {
@@ -125,13 +126,10 @@ public class AktivitetDetailFragment extends DialogFragment {
 
 		if (mSessionService.isLoggedIn() && mAktivitet.getTidspunktStart() != null && mAktivitet.getTidspunktStart().getTime() > System.currentTimeMillis()) {
 			dialogBuilder.setNeutralButton(
-				R.string.kommer_ikke, new DialogInterface.OnClickListener() {
+				mAktivitet.isDeltar() ? R.string.kommer_ikke : R.string.kommer_allikevel, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Log.i(TAG, mSessionService.getCurrentUserDisplayName() + " kommer ikke på " + mAktivitet.getAktivitetstype().toString().toLowerCase() + " " + DateUtil.getFormattedDateTime(mAktivitet.getTidspunktStart()));
-						//TODO: Toast?
-						//TODO: Markere aktiviteten på noe vis? Grået ut tekst? Rødaktig bakgrunn? Overstreket? Kryss over hele boksen?
-						//TODO: Send mail til gruppeleder/post@borgemusikken/dirigent
+						fireEmail();
 					}
 				});
 		}
@@ -141,10 +139,39 @@ public class AktivitetDetailFragment extends DialogFragment {
 		return loginDialog;
 	}
 
+
+	//TODO: Send mail til gruppeleder/post@borgemusikken/dirigent
+	//TODO: Lagre om man kommer eller ikke, på instansen som skrives til lokalt lager og sørge for at den
+	//ikke overskrives når vi henter aktiviteter fra nett.
+	private void fireEmail() {
+
+		String subject = "Kommer " +
+			(mAktivitet.isDeltar() ? "ikke" : "allikevel") +
+			" på " + mAktivitet.getAktivitetstype().toString().toLowerCase();
+
+		String content = getResources().getString(R.string.aktivitet_deltar_mail_content);
+		content = MessageFormat.format(
+			content,
+			mAktivitet.isDeltar() ? "ikke" : "allikevel",
+			String.valueOf(mAktivitet.getAktivitetstype()).toLowerCase(),
+			DateUtil.getFormattedDate(mAktivitet.getTidspunktStart()),
+			mSessionService.getCurrentUserDisplayName());
+
+		Intent emailIntent = new Intent(
+			Intent.ACTION_SENDTO,
+			Uri.fromParts("mailto", "lunders.and@gmail.com, anders.lund@gjensidige.no", null));
+
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+		emailIntent.putExtra(Intent.EXTRA_TEXT, content);
+
+		startActivity(emailIntent);
+	}
+
+
 	private void fireGoogleMaps(Sted sted) {
 		//Har allerede sjekket at koordinater != null her.
 		Uri mapURI = Uri.parse(sted.formatAsUri() + "&z=8");
-		Intent i = new Intent(Intent.ACTION_VIEW, mapURI);
-		startActivity(i);
+		Intent mapsIntent = new Intent(Intent.ACTION_VIEW, mapURI);
+		startActivity(mapsIntent);
 	}
 }

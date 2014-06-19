@@ -44,5 +44,8 @@
 	<string name="logout_message">Er du sikker på det?</string>
 	<string name="logout_title">Logg ut</string>
 	<string name="logout_ok">Du er nå logget ut</string>
+	<string name="kommer_allikevel">Kommer allikevel</string>
+	<string name="aktivitet_deltar_mail_content">Hei.\n\nJeg kommer {0} på {1} {2}.\n\nHilsen {3}
+	</string>
 
 </resources>

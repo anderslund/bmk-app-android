@@ -95,44 +95,14 @@ public class SessionServiceImpl implements SessionService {
 				@Override
 				public void run() {
 					try {
-						byte[] bytes = ServiceHelper.hentRaadata(GITHUB_SESSION_PREFIX + username);
-
-						if (bytes == null) {
-							sendValue(LoginStatus.BAD_CREDENTIALS, listener);
-							return;
-						}
-
-						String userData = new String(bytes, "UTF-8");
-
-						String[] tokens = userData.split(":");
-						String displayName = tokens[0];
-						String storedHash = tokens[1];
-
-						String hashBase = username.toString() + password.toString();
-						String hashed = hashEncode(hashBase);
-						if (!hashed.equals(storedHash)) {
-							sendValue(LoginStatus.BAD_CREDENTIALS, listener);
-							return;
-						}
-
-						mLoggedInUserId = username.toString();
-						mLoggedInUserDisplayName = displayName;
-
-						sendValue(LoginStatus.OK, listener);
-
-						final FileOutputStream fileOutputStream = mContext.openFileOutput(SESSION_CACHE, Context.MODE_PRIVATE);
-						PrintWriter writer = new PrintWriter(new OutputStreamWriter(fileOutputStream));
-						writer.println(mLoggedInUserId + ":" + mLoggedInUserDisplayName);
-						writer.flush();
-						writer.close();
+						LoginStatus status = doLogin(username, password);
+						sendValue(status, listener);
 					}
 					catch (FileNotFoundException e) {
 						sendValue(LoginStatus.BAD_CREDENTIALS, listener);
-						return;
 					}
 					catch (Exception e) {
 						sendValue(LoginStatus.COMM_FAILURE, listener);
-						return;
 					}
 				}
 			});
@@ -146,6 +116,14 @@ public class SessionServiceImpl implements SessionService {
 		//TODO: Send et kall til GitHub med nytt passord for brukeren og commit.
 	}
 
+	public String getCurrentUserID() {
+		return mLoggedInUserId;
+	}
+
+
+	public String getCurrentUserDisplayName() {
+		return mLoggedInUserDisplayName;
+	}
 
 	public boolean isLoggedIn() {
 		if (mLoggedInUserId != null) {
@@ -159,6 +137,39 @@ public class SessionServiceImpl implements SessionService {
 		establishCredentialsFromLocalStorage();
 		return mLoggedInUserId != null;
 	}
+
+
+
+	private LoginStatus doLogin(CharSequence username, CharSequence password) throws IOException {
+		byte[] bytes = ServiceHelper.hentRaadata(GITHUB_SESSION_PREFIX + username);
+
+		if (bytes == null) {
+			return LoginStatus.BAD_CREDENTIALS;
+		}
+
+		String userData = new String(bytes, "UTF-8");
+
+		String[] tokens = userData.split(":");
+		String displayName = tokens[0];
+		String storedHash = tokens[1];
+
+		String hashBase = username.toString() + password.toString();
+		String hashed = hashEncode(hashBase);
+		if (!hashed.equals(storedHash)) {
+			return LoginStatus.BAD_CREDENTIALS;
+		}
+
+		mLoggedInUserId = username.toString();
+		mLoggedInUserDisplayName = displayName;
+
+		final FileOutputStream fileOutputStream = mContext.openFileOutput(SESSION_CACHE, Context.MODE_PRIVATE);
+		PrintWriter writer = new PrintWriter(new OutputStreamWriter(fileOutputStream));
+		writer.println(mLoggedInUserId + ":" + mLoggedInUserDisplayName);
+		writer.flush();
+		writer.close();
+		return LoginStatus.OK;
+	}
+
 
 
 	private void establishCredentialsFromLocalStorage() {
@@ -183,16 +194,6 @@ public class SessionServiceImpl implements SessionService {
 		mContext.deleteFile(SESSION_CACHE);
 		Log.i(TAG, "Creds fjernet fra lokalt lager");
 	}
-
-	public String getCurrentUserID() {
-		return mLoggedInUserId;
-	}
-
-
-	public String getCurrentUserDisplayName() {
-		return mLoggedInUserDisplayName;
-	}
-
 
 
 	private void sendValue(final LoginStatus loginStatus, final LoginListener listener) {

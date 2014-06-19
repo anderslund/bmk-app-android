@@ -146,11 +146,13 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 			TextView aktivitetContent = (TextView) theView.findViewById(R.id.aktivitetListContent);
 			aktivitetContent.setText(StringUtil.truncate(aktivitet.getBeskrivelse(), 100));
 
-			if (System.currentTimeMillis() > aktivitet.getTidspunktStart().getTime()) {
-				aktivitetHeader.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-				aktivitetStart.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-				aktivitetContent.setPaintFlags(aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-			}
+			int paintFlags = System.currentTimeMillis() > aktivitet.getTidspunktStart().getTime() ?
+				aktivitetHeader.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG :
+				aktivitetHeader.getPaintFlags() & 0xEF;
+
+			aktivitetHeader.setPaintFlags(paintFlags);
+			aktivitetStart.setPaintFlags(paintFlags);
+			aktivitetContent.setPaintFlags(paintFlags);
 
 			ImageView aktivitetIcon = (ImageView) theView.findViewById(R.id.aktivitetListIcon);
 
@@ -170,6 +172,10 @@ public class AktivitetlisteFragment extends ListFragment implements AktivitetSer
 					resourceId = R.drawable.ic_konsert_trans;
 			}
 			aktivitetIcon.setImageResource(resourceId);
+
+			ImageView deltarIcon = (ImageView) theView.findViewById(R.id.deltarIcon);
+			deltarIcon.setVisibility(aktivitet.isDeltar() ? View.GONE : View.VISIBLE);
+
 			return theView;
 		}
 	}

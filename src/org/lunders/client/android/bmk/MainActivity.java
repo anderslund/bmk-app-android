@@ -59,7 +59,7 @@ public class MainActivity extends FragmentActivity {
 	private FragmentManager mFragmentManager;
 	private FrameLayout     mFragmentContainer;
 	private ActionBar       mActionBar;
-	private SessionService mSessionService;
+	private SessionService  mSessionService;
 
 
 	/** Hovedmetoden i en aktivitet. Tilsvarende main i en vanlig Java-app */

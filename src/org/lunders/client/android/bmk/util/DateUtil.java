@@ -35,8 +35,12 @@ public class DateUtil {
 
 	private static final SimpleDateFormat formattedTime = new SimpleDateFormat("HH':'mm");
 
+	public static synchronized String getFormattedDate(Date d) {
+		return formattedDateFormat.format(d);
+	}
+
 	public static synchronized String getFormattedCurrentDate() {
-		return formattedDateFormat.format(new Date());
+		return getFormattedDate(new Date());
 	}
 
 	public static synchronized String getFormattedDateTime(Date d) {
