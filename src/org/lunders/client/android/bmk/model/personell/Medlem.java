@@ -17,7 +17,6 @@
 package org.lunders.client.android.bmk.model.personell;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
 public class Medlem implements Comparable<Medlem>, Serializable {
 

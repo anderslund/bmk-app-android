@@ -16,7 +16,6 @@
 
 package org.lunders.client.android.bmk.services.impl.bilde;
 
-import android.graphics.Bitmap;
 import org.lunders.client.android.bmk.model.bilde.Bilde;
 
 public interface DownloadListener<Token> {
